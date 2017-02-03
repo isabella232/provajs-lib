@@ -1,5 +1,5 @@
 {
-  "name": "provajs",
+  "name": "prova",
   "version": "0.0.1",
   "description": "Library for interacting with Prova-blockchain-secured assets",
   "main": "index.js",
