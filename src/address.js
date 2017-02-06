@@ -2,7 +2,7 @@ const bitcoin = require('bitcoinjs-lib');
 const bs58check = require('bs58check');
 const bscript = require('./script');
 const networks = require('./networks');
-const OPS = require('bitcoin-ops');
+const OPS = require('./ops');
 const ECPair = require('./ecPair');
 const HDNode = require('./hdNode');
 const typeforce = require('typeforce');
@@ -108,7 +108,7 @@ Address.prototype.toScript = function() {
     bscript.encodeNumber(this.keyID1),
     bscript.encodeNumber(this.keyID2),
     OPS.OP_3,
-    186 // OP_CHECK_SAFE_MULTISIG
+    OPS.OP_CHECKSAFEMULTISIG
   ];
   return bscript.compile(components);
 };

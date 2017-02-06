@@ -1,7 +1,7 @@
 const assert = require('assert');
 const prova = require('../index');
 
-describe('Transaction Builer', function() {
+describe('Transaction Builder', function() {
   it('should sign unsigned transaction', function() {
     const txHex = '01000000018ff8476a60aaf5af8fb9fcf76430e07d53c8d3be512c78ebd42456711dddf9a60000000000ffffffff0100f2052a010000001d521435dbbf04bca061e49dace08f858d8775c0a57c8e030000015153ba00000000';
     const transaction = prova.Transaction.fromHex(txHex);

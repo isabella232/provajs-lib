@@ -33,6 +33,42 @@ const buildInput = (input) => {
   }
 };
 
+/**
+ * Admin Outputs can be either thread continuation outputs, or operation outputs
+ * Creates an output delineating the thread
+ * Operation outputs are broken down as follows:
+ * - Issue and revoke keys (Root thread)
+ *   - Provisioning keys (can issue and revoke validator and ASP keys)
+ *   - Issuing keys (can issue and destroy funds)
+ * - Provision non-root keys (Provisioning thread)
+ *   - Validator keys (like mining)
+ *   - Account Service Provider keys
+ * - Issue funds (Issuing thread)
+ */
+TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
+
+};
+
+/**
+ * Auto-infers the thread based on keyType
+ * @param operation (whether it's to provision or to revoke)
+ * @param keyType
+ * @param keyID
+ * @param publicKey
+ */
+TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, keyID, publicKey) {
+
+};
+
+TransactionBuilder.prototype.addFundIssuanceOutput = function(destination, amount) {
+
+};
+
+TransactionBuilder.prototype.addFundDestructionOutput = function(amount) {
+
+};
+
+
 TransactionBuilder.prototype.__addInputUnsafe = function(txHash, vout, options) {
   if (Transaction.isCoinbaseHash(txHash)) {
     throw new Error('coinbase inputs not supported')

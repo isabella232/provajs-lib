@@ -136,4 +136,15 @@ describe('HDNode', function() {
       hdPath.derive('/1230141/1230141/1230141').toBase58().should.equal('xpub6Cgenu1h7Dv5CvhajBWtVXzJREAJyoQPM5BLuzgcrRmNCc4gLYdhuM4fggrkkLH3m2GoiCnqD3sP8W5UuFxVH6oLDMYckJszyjQNhkVjkYe');
     });
   });
+
+  describe('Network Consistency', function(){
+    it('should preserve network through derivations', function(){
+      const prv = 'xprv9s21ZrQH143K2KNCT5MHvotjrf4gSjv7zL5KXPvxaZwshFZn3cptpyWJGmajrY9pH9Rix41msRQCUzUeBATAg1u4LscmXi8gg7KNRDCAnFz';
+      const keychain = prova.HDNode.fromBase58(prv, prova.networks.rmgTest);
+      const hdPath = keychain.hdPath();
+      const path = 'm/0/0/0/0';
+      const derivedKey = hdPath.deriveKey(path);
+      derivedKey.network.should.equal(keychain.keyPair.network);
+    });
+  });
 });

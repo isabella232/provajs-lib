@@ -198,6 +198,19 @@ describe('Address', function () {
       assert.strictEqual(addressString, aztecAddress.toString());
     });
 
+    it('assembles Aztec address with HDNode', function() {
+
+      const xpub = 'xpub661MyMwAqRbcFXFu3j49biFNZYZmPALfK3yPei94zrJfyZy38yNs6VmWy65VouoMMAiQ5ZyS131M7i4RWXa88VUdTfduuH3FFRxNMpPfTSY';
+      const hdNode = prova.HDNode.fromBase58(xpub);
+
+      const keyID1 = 33554432;
+      const keyID2 = 16777216;
+
+      const aztecAddress = new prova.Address(hdNode, keyID1, keyID2, prova.networks.rmg);
+      const addressString = 'GFDFqYMcz4MhzeQvaosNDVKazDx9yQ8TzqtianpbN1SFc';
+      assert.strictEqual(addressString, aztecAddress.toString());
+    });
+
     it('assembles Aztec address with xpub and xprv', function() {
 
       const xprv = 'xprv9s21ZrQH143K3YbWtKTYyi6qx9FT14u5wowHU13pxS12jT84hhA8gNdZHL28iyfSAkd4sAiRanRwzJ3bRykUvmwDMAKp9gFwRAAmLuBpULA';

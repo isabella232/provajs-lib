@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const ECPair = require('./ecPair');
 const ecurve = require('ecurve');
 const curve = ecurve.getCurveByName('secp256k1');
-const networks = require('./networks');
+const NETWORKS = require('./networks');
 const typeforce = require('typeforce');
 const types = require('./types');
 
@@ -32,7 +32,7 @@ HDNode.prototype.neutered = function() {
 };
 
 HDNode.prototype.getKey = function(network) {
-  network = network || networks.rmg;
+  network = network || this.keyPair.network || NETWORKS.rmg;
   const k = this.keyPair;
   const result = new ECPair(k.d, k.d ? null : k.Q, { network: network, compressed: k.compressed });
   // Creating Q from d takes ~25ms, so if it's not created, use native bindings to pre-compute
