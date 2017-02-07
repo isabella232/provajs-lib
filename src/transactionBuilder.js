@@ -1,10 +1,10 @@
-const Address = require('./Address');
+const Address = require('./address');
 const bitcoin = require('bitcoinjs-lib');
 const ECPair = require('./ecPair');
 const HDNode = require('./hdNode');
 const OPS = require('./ops');
 const script = require('./script');
-const Transaction = require('./Transaction');
+const Transaction = require('./transaction');
 
 const TransactionBuilder = bitcoin.TransactionBuilder;
 
