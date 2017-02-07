@@ -60,4 +60,11 @@ ECPair.fromPrivateKeyBuffer = function(buffer, network) {
   return new ECPair(d, null, { network: network });
 };
 
+ECPair.prototype.getPrivateKeyBuffer = function() {
+  if (!this.d) {
+    throw new Error('private key unknown');
+  }
+  return this.d.toBuffer();
+};
+
 module.exports = ECPair;

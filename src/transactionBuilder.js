@@ -1,8 +1,37 @@
 const Address = require('./Address');
 const bitcoin = require('bitcoinjs-lib');
+const ECPair = require('./ecPair');
+const HDNode = require('./hdNode');
+const OPS = require('./ops');
+const script = require('./script');
 const Transaction = require('./Transaction');
 
 const TransactionBuilder = bitcoin.TransactionBuilder;
+
+TransactionBuilder.ADMIN = {
+  THREADS: {
+    ROOT: 0,
+    PROVISIONING: 1,
+    ISSUANCE: 2
+  },
+  OPERATIONS: {
+    ADD_KEY: 0,
+    REVOKE_KEY: 1,
+    ISSUE_FUNDS: 2,
+    DESTROY_FUNDS: 3
+  },
+  KEY_TYPES: {
+    ROOT: {
+      PROVISIONING_KEY: 0,
+      ISSUANCE_KEY: 1
+    },
+    PROVISIONING: {
+      VALIDATOR_KEY: 2,
+      ACCOUNT_SERVICE_PROVIDER_KEY: 3
+    }
+  }
+};
+
 
 const expandInput = (scriptSig) => {
   const scriptSigChunks = bitcoin.script.decompile(scriptSig);
@@ -33,6 +62,41 @@ const buildInput = (input) => {
   }
 };
 
+const determineKeyUpdateOpCode = (operation, keyType) => {
+  const keyTypes = TransactionBuilder.ADMIN.KEY_TYPES;
+  switch (keyType) {
+    case keyTypes.ROOT.ISSUANCE_KEY:
+      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+        return OPS.OP_ISSUEKEYADD;
+      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+        return OPS.OP_ISSUEKEYREVOKE;
+      }
+      break;
+    case keyTypes.ROOT.PROVISIONING_KEY:
+      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+        return OPS.OP_PROVISIONKEYADD;
+      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+        return OPS.OP_PROVISIONKEYREVOKE;
+      }
+      break;
+    case keyTypes.PROVISIONING.VALIDATOR_KEY:
+      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+        return OPS.OP_VALIDATEKEYADD;
+      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+        return OPS.OP_VALIDATEKEYREVOKE;
+      }
+      break;
+    case keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY:
+      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+        return OPS.OP_ASPKEYADD;
+      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+        return OPS.OP_ASPKEYREVOKE;
+      }
+      break;
+  }
+  throw new Error('invalid admin key type and operation combination');
+};
+
 /**
  * Admin Outputs can be either thread continuation outputs, or operation outputs
  * Creates an output delineating the thread
@@ -46,18 +110,66 @@ const buildInput = (input) => {
  * - Issue funds (Issuing thread)
  */
 TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
-
+  const permissibleThreads = [
+    TransactionBuilder.ADMIN.THREADS.ROOT,
+    TransactionBuilder.ADMIN.THREADS.PROVISIONING,
+    TransactionBuilder.ADMIN.THREADS.ISSUANCE,
+  ];
+  if (permissibleThreads.indexOf(thread) === -1) {
+    throw new Error('invalid admin thread');
+  }
+  const script = Buffer.from([thread, OPS.OP_CHECKTHREAD]);
+  this.tx.addOutput(script, 0);
 };
 
 /**
  * Auto-infers the thread based on keyType
  * @param operation (whether it's to provision or to revoke)
  * @param keyType
- * @param keyID
  * @param publicKey
+ * @param keyID
  */
-TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, keyID, publicKey) {
+TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, publicKey, keyID) {
+  const permissibleOperations = [
+    TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY,
+    TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY
+  ];
+  if (permissibleOperations.indexOf(operation) === -1) {
+    throw new Error('invalid admin key operation');
+  }
 
+  let opCode = determineKeyUpdateOpCode(operation, keyType);
+  let bufferLength = 34;
+  if (keyType === TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY) {
+    // we add four bytes for the key id
+    bufferLength += 4;
+    if (!keyID) {
+      throw new Error('key id must not be empty for ASP key provisioning');
+    }
+  }
+
+  let publicKeyBuffer;
+  if (Buffer.isBuffer(publicKey)) {
+    publicKeyBuffer = publicKey;
+  } else if (publicKey instanceof ECPair) {
+    publicKeyBuffer = publicKey.getPublicKeyBuffer();
+  } else if (publicKey instanceof HDNode) {
+    publicKeyBuffer = publicKey.getPublicKeyBuffer();
+  }
+
+  const subScript = Buffer.alloc(bufferLength);
+  subScript[0] = opCode;
+  publicKeyBuffer.copy(subScript, 1);
+
+  // the buffer length is longer by 4 bytes, totaling 38, for the key id
+  if (bufferLength === 38 && keyID) {
+    subScript.writeUInt32LE(keyID, 34);
+  }
+
+  const scripts = [OPS.OP_RETURN, subScript];
+  const scriptBuffer = script.compile(scripts);
+
+  this.tx.addOutput(scriptBuffer, 0);
 };
 
 TransactionBuilder.prototype.addFundIssuanceOutput = function(destination, amount) {
