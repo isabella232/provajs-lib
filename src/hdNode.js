@@ -31,8 +31,7 @@ HDNode.prototype.neutered = function() {
   return neutered;
 };
 
-HDNode.prototype.getKey = function(network) {
-  network = network || this.keyPair.network || NETWORKS.rmg;
+HDNode.prototype.getKey = function(network = this.keyPair.network || NETWORKS.rmg) {
   const k = this.keyPair;
   const result = new ECPair(k.d, k.d ? null : k.Q, { network: network, compressed: k.compressed });
   // Creating Q from d takes ~25ms, so if it's not created, use native bindings to pre-compute

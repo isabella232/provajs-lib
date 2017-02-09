@@ -154,7 +154,7 @@ describe('Address', function () {
 
 
       const address = 'G9mwJwfrhveVw4kjLYaQymjxiH3xXp9VdzXdW5QeyFcTy';
-      const aztecAddress = new prova.Address.fromBuffer(inputBuffer, network);
+      const aztecAddress = prova.Address.fromBuffer(inputBuffer, network);
       const base58Output = aztecAddress.toString();
       assert.strictEqual(address, base58Output);
     });

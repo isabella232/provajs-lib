@@ -69,10 +69,10 @@ Transaction.prototype.__byteLength = function(__allowWitness, __isStripped) {
   return byteLength;
 };
 
-Transaction.prototype.__toBuffer = function(buffer, initialOffset, __allowWitness, __isStripped) {
+Transaction.prototype.__toBuffer = function(buffer, initialOffset = 0, __allowWitness, __isStripped) {
   if (!buffer) buffer = new Buffer(this.__byteLength(__allowWitness, __isStripped));
 
-  let offset = initialOffset || 0;
+  let offset = initialOffset;
 
   const writeSlice = (slice) => { offset += slice.copy(buffer, offset); };
 

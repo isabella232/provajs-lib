@@ -6,15 +6,11 @@ const secp256k1 = ecurve.getCurveByName('secp256k1');
 const typeforce = require('typeforce');
 const types = require('./types');
 
-const ECPair = function ECPair(d, Q, options) {
-  if (options) {
-    typeforce({
-      compressed: types.maybe(types.Boolean),
-      network: types.maybe(types.Network)
-    }, options)
-  }
-
-  options = options || {};
+const ECPair = function ECPair(d, Q, options = {}) {
+  typeforce({
+    compressed: types.maybe(types.Boolean),
+    network: types.maybe(types.Network)
+  }, options);
 
   if (d) {
     if (d.signum() <= 0) {
