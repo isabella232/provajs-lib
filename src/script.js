@@ -20,6 +20,9 @@ script.decodeNumber = function(number) {
     }
     return script.number.decode(number);
   } else {
+    if (number === 0) {
+      return 0;
+    }
     return number - OP_INT_BASE;
   }
 };

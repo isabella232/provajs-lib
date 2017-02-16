@@ -228,11 +228,21 @@ describe('Address', function () {
 
     it('reassembles Aztec address from string', function() {
 
-      // const addressString = 'GHhkNgqmMjwUjVYmsRjW281HhFRXuSX5cuFQc4C88Esyi';
       const addressString = 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH';
       const aztecAddress = prova.Address.fromBase58(addressString);
       assert.strictEqual(aztecAddress.publicKeyHash.toString('hex'), '7ef3c5b03eb6a485ff34a31da7266c0a0e180daf');
       assert.strictEqual(aztecAddress.toString(), 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH');
+    });
+
+    it('assembles Aztec address from odd script', function() {
+      const script = Buffer.from('5214ddaa0c1d6a65f5c38444a1b5bf6779d00d2b4fc4005153ba', 'hex');
+      const aztecAddress = prova.Address.fromScript(script);
+      const addressString = aztecAddress.toString(prova.networks.rmgTest);
+      const expectedString = 'TQ8A7DEjwUfTsdPnLbbQX3xqekfWpN42hPsdDDskR4h3K';
+      const restoredScript = prova.Address.fromBase58(addressString).toScript();
+      assert.strictEqual(addressString, expectedString);
+      assert.strictEqual(script.toString('hex'), restoredScript.toString('hex'));
+
     });
 
     it('validates Aztec address', function() {
