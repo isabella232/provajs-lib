@@ -4,6 +4,7 @@ const ECPair = require('./ecPair');
 const HDNode = require('./hdNode');
 const OPS = require('./ops');
 const script = require('./script');
+const networks = require('./networks');
 const Transaction = require('./transaction');
 
 const TransactionBuilder = bitcoin.TransactionBuilder;
@@ -97,6 +98,11 @@ const determineKeyUpdateOpCode = (operation, keyType) => {
   throw new Error('invalid admin key type and operation combination');
 };
 
+const oldFromTransaction = TransactionBuilder.fromTransaction;
+TransactionBuilder.fromTransaction = function(transaction, network = networks.rmg) {
+  return oldFromTransaction(transaction, network);
+};
+
 /**
  * Admin Outputs can be either thread continuation outputs, or operation outputs
  * Creates an output delineating the thread
@@ -155,6 +161,8 @@ TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, p
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
   } else if (publicKey instanceof HDNode) {
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
+  } else {
+    throw new Error('publicKey needs to be instance of Buffer, ECPair, or HDNode');
   }
 
   const subScript = Buffer.alloc(bufferLength);
@@ -172,12 +180,8 @@ TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, p
   this.tx.addOutput(scriptBuffer, 0);
 };
 
-TransactionBuilder.prototype.addFundIssuanceOutput = function(destination, amount) {
-
-};
-
 TransactionBuilder.prototype.addFundDestructionOutput = function(amount) {
-
+  this.tx.addOutput(script.compile([OPS.OP_RETURN]), amount);
 };
 
 
@@ -249,7 +253,17 @@ TransactionBuilder.prototype.addOutput = function(scriptPubKey, value) {
 
 TransactionBuilder.prototype.signWithTx = function(vin, keyPair, prevOutTx) {
   // ready to sign
-  const prevOut = prevOutTx.outs[this.tx.ins[vin].index];
+  if (!(prevOutTx instanceof Transaction)) {
+    throw new Error('prevOutTx needs to be instance of Transaction');
+  }
+  const currentIn = this.tx.ins[vin];
+  const referencedTxId = currentIn.hash.reverse().toString('hex');
+  const actualTxId = prevOutTx.getId();
+  if (referencedTxId !== actualTxId) {
+    throw new Error('unexpected prevOutTx with id ' + actualTxId + ', as opposed to expected ' + referencedTxId);
+  }
+  const previousOutputIndex = currentIn.index;
+  const prevOut = prevOutTx.outs[previousOutputIndex];
   const hashScript = prevOut.script;
   const witnessValue = prevOut.value;
 
@@ -257,6 +271,10 @@ TransactionBuilder.prototype.signWithTx = function(vin, keyPair, prevOutTx) {
 };
 
 TransactionBuilder.prototype.sign = function(vin, keyPair, redeemScript, redeemValue) {
+  if (!(keyPair instanceof ECPair)) {
+    throw new Error('keyPair needs to be instance of ECPair');
+  }
+
   if (keyPair.network !== this.network) {
     throw new Error('Inconsistent network');
   }
