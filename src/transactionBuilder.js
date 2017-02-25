@@ -177,8 +177,16 @@ TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, p
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
   } else if (publicKey instanceof HDNode) {
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
+  } else if (publicKey instanceof String) {
+    if (publicKey.startsWith('xpub')) {
+      const hdNode = HDNode.fromBase58(publicKey, this.network);
+      publicKeyBuffer = hdNode.getPublicKeyBuffer();
+    } else {
+      const ecPair = ECPair.fromPublicKeyBuffer(Buffer.from(publicKey, 'hex'), this.network);
+      publicKeyBuffer = ecPair.getPublicKeyBuffer();
+    }
   } else {
-    throw new Error('publicKey needs to be instance of Buffer, ECPair, or HDNode');
+    throw new Error('publicKey needs to be hex or xpub String, or instance of Buffer, ECPair, or HDNode');
   }
 
   const subScript = Buffer.alloc(bufferLength);
