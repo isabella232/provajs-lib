@@ -177,7 +177,7 @@ TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, p
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
   } else if (publicKey instanceof HDNode) {
     publicKeyBuffer = publicKey.getPublicKeyBuffer();
-  } else if (publicKey instanceof String) {
+  } else if (typeof publicKey === 'string') {
     if (publicKey.startsWith('xpub')) {
       const hdNode = HDNode.fromBase58(publicKey, this.network);
       publicKeyBuffer = hdNode.getPublicKeyBuffer();
