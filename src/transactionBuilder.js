@@ -144,10 +144,14 @@ TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
   this.tx.addOutput(script, 0);
 };
 
+/**
+ * Determined the admin thread output index
+ * @return {number}
+ */
 TransactionBuilder.prototype.getAdminThreadOutputIndex = function() {
   for (let i = 0; i < this.tx.outs.length; i++) {
     const { script } = this.tx.outs[i];
-    if (script && script.length == 2 && script[1] == OPS.OP_CHECKTHREAD) {
+    if (script && script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
       return i;
     }
   }
