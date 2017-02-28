@@ -140,8 +140,8 @@ TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
   if (permissibleThreads.indexOf(thread) === -1) {
     throw new Error('invalid admin thread');
   }
-  const script = Buffer.from([thread, OPS.OP_CHECKTHREAD]);
-  this.tx.addOutput(script, 0);
+  const outputScript = script.compile([script.encodeNumber(thread), OPS.OP_CHECKTHREAD]);
+  this.tx.addOutput(outputScript, 0);
 };
 
 /**
