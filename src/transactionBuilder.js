@@ -84,30 +84,30 @@ const determineKeyUpdateOpCode = (operation, keyType) => {
   switch (keyType) {
     case keyTypes.ROOT.ISSUANCE_KEY:
       if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
-        return OPS.OP_ISSUEKEYADD;
+        return OPS.ADMIN_OP_ISSUEKEYADD;
       } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
-        return OPS.OP_ISSUEKEYREVOKE;
+        return OPS.ADMIN_OP_ISSUEKEYREVOKE;
       }
       break;
     case keyTypes.ROOT.PROVISIONING_KEY:
       if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
-        return OPS.OP_PROVISIONKEYADD;
+        return OPS.ADMIN_OP_PROVISIONKEYADD;
       } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
-        return OPS.OP_PROVISIONKEYREVOKE;
+        return OPS.ADMIN_OP_PROVISIONKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.VALIDATOR_KEY:
       if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
-        return OPS.OP_VALIDATEKEYADD;
+        return OPS.ADMIN_OP_VALIDATEKEYADD;
       } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
-        return OPS.OP_VALIDATEKEYREVOKE;
+        return OPS.ADMIN_OP_VALIDATEKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY:
       if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
-        return OPS.OP_ASPKEYADD;
+        return OPS.ADMIN_OP_ASPKEYADD;
       } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
-        return OPS.OP_ASPKEYREVOKE;
+        return OPS.ADMIN_OP_ASPKEYREVOKE;
       }
       break;
   }
