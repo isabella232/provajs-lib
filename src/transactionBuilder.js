@@ -145,6 +145,20 @@ TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
 };
 
 /**
+ * Determined the admin thread output index
+ * @return {number}
+ */
+TransactionBuilder.prototype.getAdminThreadOutputIndex = function() {
+  for (let i = 0; i < this.tx.outs.length; i++) {
+    const { script } = this.tx.outs[i];
+    if (script && script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+/**
  * Auto-infers the thread based on keyType
  * @param operation (whether it's to provision or to revoke)
  * @param keyType
@@ -281,7 +295,7 @@ TransactionBuilder.prototype.signWithTx = function(vin, keyPair, prevOutTx) {
     throw new Error('prevOutTx needs to be instance of Transaction');
   }
   const currentIn = this.tx.ins[vin];
-  const referencedTxId = currentIn.hash.reverse().toString('hex');
+  const referencedTxId = Buffer.from(currentIn.hash).reverse().toString('hex');
   const actualTxId = prevOutTx.getId();
   if (referencedTxId !== actualTxId) {
     throw new Error('unexpected prevOutTx with id ' + actualTxId + ', as opposed to expected ' + referencedTxId);

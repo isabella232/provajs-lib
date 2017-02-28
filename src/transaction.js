@@ -1,4 +1,6 @@
 const bitcoin = require('bitcoinjs-lib');
+const OPS = require('./ops');
+const pScript = require('./script');
 const typeforce = require('typeforce');
 const types = require('./types');
 const varuint = require('varuint-bitcoin');
@@ -229,6 +231,19 @@ Transaction.prototype.hashForWitnessV0 = function(inIndex, prevOutScript, value,
   writeUInt32(this.locktime);
   writeUInt32(hashType);
   return bitcoin.crypto.hash256(tbuffer);
+};
+
+const oldFromBuffer = Transaction.fromBuffer;
+Transaction.fromBuffer = function(buffer, __noStrict) {
+  const tx = oldFromBuffer(buffer, __noStrict);
+  for (const currentOut of tx.outs) {
+    const { script } = currentOut;
+    if (script && script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
+      currentOut.isAdminThreadOutput = true;
+      currentOut.adminThread = pScript.decodeNumber(script[0]);
+    }
+  }
+  return tx;
 };
 
 module.exports = Transaction;
