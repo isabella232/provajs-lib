@@ -299,9 +299,13 @@ Transaction.fromBuffer = function(buffer, __noStrict) {
   for (const currentOut of tx.outs) {
     const { script } = currentOut;
     if (script) {
-      if (script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
+      if (script.length === 1 && script[0] === OPS.OP_RETURN) {
+        currentOut.isAdminOperation = true;
+        currentOut.operation = ADMIN.OPERATIONS.DESTROY_FUNDS;
+      } else if (script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
         currentOut.isAdminThreadOutput = true;
         currentOut.adminThread = pScript.decodeNumber(script[0]);
+
       }
       const components = pScript.decompile(script);
       if (components[0] === OPS.OP_RETURN && components.length === 2) {
