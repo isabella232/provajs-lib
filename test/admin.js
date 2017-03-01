@@ -13,8 +13,8 @@ describe('Admin', function() {
       const adminThreadOutputIndex = builder.getAdminThreadOutputIndex();
       assert.strictEqual(adminThreadOutputIndex, 0);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.ROOT.ISSUANCE_KEY;
+      const operation = prova.ADMIN.OPERATIONS.ADD_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.ROOT.ISSUANCE_KEY;
       const publicKey = prova.ECPair.fromPublicKeyBuffer(Buffer.from('025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, publicKey);
 
@@ -28,8 +28,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.ROOT.ISSUANCE_KEY;
+      const operation = prova.ADMIN.OPERATIONS.REVOKE_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.ROOT.ISSUANCE_KEY;
       const publicKey = prova.ECPair.fromPublicKeyBuffer(Buffer.from('025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, publicKey);
 
@@ -43,8 +43,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.ROOT.PROVISIONING_KEY;
+      const operation = prova.ADMIN.OPERATIONS.ADD_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.ROOT.PROVISIONING_KEY;
       const publicKey = prova.ECPair.fromPublicKeyBuffer(Buffer.from('025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, publicKey);
 
@@ -58,8 +58,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.ROOT.PROVISIONING_KEY;
+      const operation = prova.ADMIN.OPERATIONS.REVOKE_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.ROOT.PROVISIONING_KEY;
       const publicKey = prova.ECPair.fromPublicKeyBuffer(Buffer.from('025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, publicKey);
 
@@ -73,8 +73,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.VALIDATOR_KEY;
+      const operation = prova.ADMIN.OPERATIONS.ADD_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.PROVISIONING.VALIDATOR_KEY;
       const privateKey = prova.ECPair.fromPrivateKeyBuffer(Buffer.from('eaf02ca348c524e6392655ba4d29603cd1a7347d9d65cfe93ce1ebffdca22694', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, privateKey);
 
@@ -88,8 +88,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.VALIDATOR_KEY;
+      const operation = prova.ADMIN.OPERATIONS.REVOKE_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.PROVISIONING.VALIDATOR_KEY;
       const privateKey = prova.ECPair.fromPrivateKeyBuffer(Buffer.from('eaf02ca348c524e6392655ba4d29603cd1a7347d9d65cfe93ce1ebffdca22694', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, privateKey);
 
@@ -105,8 +105,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY;
+      const operation = prova.ADMIN.OPERATIONS.ADD_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY;
       const privateKey = prova.ECPair.fromPrivateKeyBuffer(Buffer.from('eaf02ca348c524e6392655ba4d29603cd1a7347d9d65cfe93ce1ebffdca22694', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, privateKey, 65536);
 
@@ -120,8 +120,8 @@ describe('Admin', function() {
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
-      const operation = prova.TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY;
-      const keyType = prova.TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY;
+      const operation = prova.ADMIN.OPERATIONS.REVOKE_KEY;
+      const keyType = prova.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY;
       const privateKey = prova.ECPair.fromPrivateKeyBuffer(Buffer.from('eaf02ca348c524e6392655ba4d29603cd1a7347d9d65cfe93ce1ebffdca22694', 'hex'));
       builder.addKeyUpdateOutput(operation, keyType, privateKey, 65536);
 
@@ -172,6 +172,13 @@ describe('Admin', function() {
       builder.signWithTx(1, wspPrivKey, prevFundTx);
 
       console.log('HEX OF SIGNED', builder.buildIncomplete().toHex());
+    });
+
+    it('should parse fully signed tx', () => {
+      const txHex = '0100000001a90410eca88f858aa6b639980d67fb19549f87ce8b2b4aae4cfaeb426e679be6000000006a21025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1473044022008ab745f9aaf9be937ab2575040fdefccaa19149587c436264dffb072018a73a0220476971acfa84be890a4064baccefbb2d45e328e2079a3a3a447264212cfbe35501ffffffff0200000000000000000200bb0000000000000000246a2201037334a4e8aea91bce5e48d75cdd2852c31b77ab9a2549bebc0be3e3f5116e53c800000000';
+      const tx = prova.Transaction.fromHex(txHex);
+      const builder = prova.TransactionBuilder.fromTransaction(tx);
+      console.log('here');
     });
   });
 

@@ -1,4 +1,5 @@
 const Address = require('./address');
+const ADMIN = require('./admin');
 const bitcoin = require('bitcoinjs-lib');
 const ECPair = require('./ecPair');
 const HDNode = require('./hdNode');
@@ -9,46 +10,7 @@ const Transaction = require('./transaction');
 
 const TransactionBuilder = bitcoin.TransactionBuilder;
 
-TransactionBuilder.ADMIN = {
-  // all available threads
-  THREADS: {
-    ROOT: 0,
-    PROVISIONING: 1,
-    ISSUANCE: 2
-  },
-  // reverse lookup map/array for the threads
-  THREAD_MAP: ['ROOT', 'PROVISIONING', 'ISSUANCE'],
-
-  // all available operations
-  OPERATIONS: {
-    ADD_KEY: 0,
-    REVOKE_KEY: 1,
-    ISSUE_FUNDS: 2,
-    DESTROY_FUNDS: 3
-  },
-  // reverse lookup map/array for the operations
-  OPERATION_MAP: ['ADD_KEY', 'REVOKE_KEY', 'ISSUE_FUNDS', 'DESTROY_FUNDS'],
-
-  // key types, grouped by thread
-  KEY_TYPES: {
-    ROOT: {
-      PROVISIONING_KEY: 0,
-      ISSUANCE_KEY: 1
-    },
-    PROVISIONING: {
-      VALIDATOR_KEY: 2,
-      ACCOUNT_SERVICE_PROVIDER_KEY: 3
-    }
-  },
-  // reverse lookup map/array for the threads
-  KEY_TYPE_MAP: [
-    { thread: 'ROOT', type: 'PROVISIONING_KEY' },
-    { thread: 'ROOT', type: 'ISSUANCE_KEY' },
-    { thread: 'PROVISIONING', type: 'VALIDATOR_KEY' },
-    { thread: 'PROVISIONING', type: 'ACCOUNT_SERVICE_PROVIDER_KEY' }
-  ]
-};
-
+TransactionBuilder.ADMIN = ADMIN;
 
 const expandInput = (scriptSig) => {
   const scriptSigChunks = bitcoin.script.decompile(scriptSig);
@@ -80,33 +42,33 @@ const buildInput = (input) => {
 };
 
 const determineKeyUpdateOpCode = (operation, keyType) => {
-  const keyTypes = TransactionBuilder.ADMIN.KEY_TYPES;
+  const keyTypes = ADMIN.KEY_TYPES;
   switch (keyType) {
     case keyTypes.ROOT.ISSUANCE_KEY:
-      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_ISSUEKEYADD;
-      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_ISSUEKEYREVOKE;
       }
       break;
     case keyTypes.ROOT.PROVISIONING_KEY:
-      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_PROVISIONKEYADD;
-      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_PROVISIONKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.VALIDATOR_KEY:
-      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_VALIDATEKEYADD;
-      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_VALIDATEKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY:
-      if (operation == TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_ASPKEYADD;
-      } else if (operation == TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_ASPKEYREVOKE;
       }
       break;
@@ -133,9 +95,9 @@ TransactionBuilder.fromTransaction = function(transaction, network = networks.rm
  */
 TransactionBuilder.prototype.addAdminThreadOutput = function(thread) {
   const permissibleThreads = [
-    TransactionBuilder.ADMIN.THREADS.ROOT,
-    TransactionBuilder.ADMIN.THREADS.PROVISIONING,
-    TransactionBuilder.ADMIN.THREADS.ISSUANCE,
+    ADMIN.THREADS.ROOT,
+    ADMIN.THREADS.PROVISIONING,
+    ADMIN.THREADS.ISSUANCE,
   ];
   if (permissibleThreads.indexOf(thread) === -1) {
     throw new Error('invalid admin thread');
@@ -181,8 +143,8 @@ TransactionBuilder.prototype.getAdminThreadOutputIndex = function() {
  */
 TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, publicKey, keyID) {
   const permissibleOperations = [
-    TransactionBuilder.ADMIN.OPERATIONS.ADD_KEY,
-    TransactionBuilder.ADMIN.OPERATIONS.REVOKE_KEY
+    ADMIN.OPERATIONS.ADD_KEY,
+    ADMIN.OPERATIONS.REVOKE_KEY
   ];
   if (permissibleOperations.indexOf(operation) === -1) {
     throw new Error('invalid admin key operation');
@@ -190,7 +152,7 @@ TransactionBuilder.prototype.addKeyUpdateOutput = function(operation, keyType, p
 
   let opCode = determineKeyUpdateOpCode(operation, keyType);
   let bufferLength = 34;
-  if (keyType === TransactionBuilder.ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY) {
+  if (keyType === ADMIN.KEY_TYPES.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY) {
     // we add four bytes for the key id
     bufferLength += 4;
     if (!keyID) {

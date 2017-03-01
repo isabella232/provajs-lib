@@ -1,3 +1,4 @@
+const ADMIN = require('./admin');
 const bitcoin = require('bitcoinjs-lib');
 const OPS = require('./ops');
 const pScript = require('./script');
@@ -233,15 +234,97 @@ Transaction.prototype.hashForWitnessV0 = function(inIndex, prevOutScript, value,
   return bitcoin.crypto.hash256(tbuffer);
 };
 
+const determineOpCodeOperation = (opCode) => {
+  const keyTypes = ADMIN.KEY_TYPES;
+  const operations = ADMIN.OPERATIONS;
+  switch (opCode) {
+    case OPS.ADMIN_OP_ISSUEKEYADD:
+      return {
+        operation: operations.ADD_KEY,
+        keyType: keyTypes.ROOT.ISSUANCE_KEY
+      };
+      break;
+    case OPS.ADMIN_OP_ISSUEKEYREVOKE:
+      return {
+        operation: operations.REVOKE_KEY,
+        keyType: keyTypes.ROOT.ISSUANCE_KEY
+      };
+      break;
+
+    case OPS.ADMIN_OP_PROVISIONKEYADD:
+      return {
+        operation: operations.ADD_KEY,
+        keyType: keyTypes.ROOT.PROVISIONING_KEY
+      };
+      break;
+    case OPS.ADMIN_OP_PROVISIONKEYREVOKE:
+      return {
+        operation: operations.REVOKE_KEY,
+        keyType: keyTypes.ROOT.PROVISIONING_KEY
+      };
+      break;
+
+    case OPS.ADMIN_OP_VALIDATEKEYADD:
+      return {
+        operation: operations.ADD_KEY,
+        keyType: keyTypes.PROVISIONING.VALIDATOR_KEY
+      };
+      break;
+    case OPS.ADMIN_OP_VALIDATEKEYREVOKE:
+      return {
+        operation: operations.REVOKE_KEY,
+        keyType: keyTypes.PROVISIONING.VALIDATOR_KEY
+      };
+      break;
+
+    case OPS.ADMIN_OP_ASPKEYADD:
+      return {
+        operation: operations.ADD_KEY,
+        keyType: keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY
+      };
+      break;
+    case OPS.ADMIN_OP_ASPKEYREVOKE:
+      return {
+        operation: operations.REVOKE_KEY,
+        keyType: keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY
+      };
+      break;
+  }
+  throw new Error('invalid admin key type and operation combination');
+};
+
 const oldFromBuffer = Transaction.fromBuffer;
 Transaction.fromBuffer = function(buffer, __noStrict) {
   const tx = oldFromBuffer(buffer, __noStrict);
   for (const currentOut of tx.outs) {
     const { script } = currentOut;
-    if (script && script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
-      currentOut.isAdminThreadOutput = true;
-      currentOut.adminThread = pScript.decodeNumber(script[0]);
+    if (script) {
+      if (script.length === 2 && script[1] === OPS.OP_CHECKTHREAD) {
+        currentOut.isAdminThreadOutput = true;
+        currentOut.adminThread = pScript.decodeNumber(script[0]);
+      }
+      const components = pScript.decompile(script);
+      if (components[0] === OPS.OP_RETURN && components.length === 2) {
+        // this is an admin operation
+        const actionScript = components[1];
+        const adminOpCode = actionScript[0];
+        if (!adminOpCode) {
+          continue;
+        }
+        const action = determineOpCodeOperation(adminOpCode);
+        const publicKeyBuffer = Buffer.alloc(33);
+        actionScript.copy(publicKeyBuffer, 0, 1, 34);
+        currentOut.isAdminOperation = true;
+        currentOut.adminOpCode = adminOpCode;
+        currentOut.keyType = action.keyType;
+        currentOut.operation = action.operation;
+        currentOut.publicKey = publicKeyBuffer;
+        if (actionScript.length === 38) {
+          currentOut.keyId = Buffer.readUInt32LE(34);
+        }
+      }
     }
+
   }
   return tx;
 };
