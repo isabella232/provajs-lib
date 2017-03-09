@@ -324,7 +324,7 @@ Transaction.fromBuffer = function(buffer, __noStrict) {
         currentOut.operation = action.operation;
         currentOut.publicKey = publicKeyBuffer;
         if (actionScript.length === 38) {
-          currentOut.keyId = Buffer.readUInt32LE(34);
+          currentOut.keyId = actionScript.readUInt32LE(34);
         }
       }
     }
