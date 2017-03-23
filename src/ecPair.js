@@ -1,4 +1,5 @@
 const bitcoin = require('bitcoinjs-lib');
+const crypto = require('crypto');
 const ecurve = require('ecurve');
 const BigInteger = require('bigi');
 const NETWORKS = require('./networks');
@@ -54,6 +55,11 @@ ECPair.fromPrivateKeyBuffer = function(buffer, network) {
   }
 
   return new ECPair(d, null, { network: network });
+};
+
+ECPair.makeRandom = function(network) {
+  const privateKeyBuffer = crypto.randomBytes(32);
+  return this.fromPrivateKeyBuffer(privateKeyBuffer, network)
 };
 
 ECPair.prototype.getPrivateKeyBuffer = function() {
