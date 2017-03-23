@@ -302,7 +302,7 @@ HDNode.fromBase58 = function(string, networks) {
   return hd;
 };
 
-HDNode.fromSeedBuffer = function(seed, network) {
+HDNode.fromSeedBuffer = function(seed, network = NETWORKS.rmg) {
   typeforce(types.tuple(types.Buffer, types.maybe(types.Network)), arguments);
 
   if (seed.length < 16) {

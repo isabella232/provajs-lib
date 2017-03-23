@@ -146,5 +146,20 @@ describe('HDNode', function() {
       const derivedKey = hdPath.deriveKey(path);
       derivedKey.network.should.equal(keychain.keyPair.network);
     });
+
+    it('should obtain xpub from xprv', function(){
+      const prv = 'xprv9s21ZrQH143K2KNCT5MHvotjrf4gSjv7zL5KXPvxaZwshFZn3cptpyWJGmajrY9pH9Rix41msRQCUzUeBATAg1u4LscmXi8gg7KNRDCAnFz';
+      const keychain = prova.HDNode.fromBase58(prv, prova.networks.rmgTest);
+      const xpub = keychain.neutered().toBase58();
+      xpub.should.equal('xpub661MyMwAqRbcEoSfZ6tJHwqUQguArCdyMYzvKnLa8uUra3tvbA99Nmpn83s9dwotjLpZNUtRWviRAE4bFfyTbirRESCCPUrmfz9y8JsBCuc');
+    });
+
+    it('should be able to generate both xpub and xprv', function(){
+      const keychain = prova.HDNode.fromSeedBuffer(new Buffer('somesuperrandomseedbuffer'));
+      const xprv = keychain.toBase58();
+      const xpub = keychain.neutered().toBase58();
+      xprv.should.equal('xprv9s21ZrQH143K4Q5mPy3J4ndj6gSJCXKKXXoJE5QgyZLi671MxUPxPZvDPBNtywCsM5dy2kHujUanxc44k8mxzSgi9daf7WWTiTUULxL7wuW');
+      xpub.should.equal('xpub661MyMwAqRbcGtAEVzaJRvaTeiGnbz3Atkiu2TpJXtsgxuLWW1iCwNEhEVUqvbafwfDrcod6zP2ToEg9r9vSw4FuNQqLDLvXPnLs1o1cGGn');
+    });
   });
 });
