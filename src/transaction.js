@@ -290,7 +290,7 @@ const determineOpCodeOperation = (opCode) => {
       };
       break;
   }
-  throw new Error('invalid admin key type and operation combination');
+  throw new Error('unrecognized admin OP_RETURN output operation');
 };
 
 const oldFromBuffer = Transaction.fromBuffer;
@@ -315,7 +315,15 @@ Transaction.fromBuffer = function(buffer, __noStrict) {
         if (!adminOpCode) {
           continue;
         }
-        const action = determineOpCodeOperation(adminOpCode);
+
+        let action;
+        try {
+          action = determineOpCodeOperation(adminOpCode);
+        } catch (e) {
+          currentOut.isNonStandard = true;
+          currentOut.parseError = e;
+          continue;
+        }
         const publicKeyBuffer = Buffer.alloc(33);
         actionScript.copy(publicKeyBuffer, 0, 1, 34);
         currentOut.isAdminOperation = true;

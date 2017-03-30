@@ -175,10 +175,25 @@ describe('Admin', function() {
     });
 
     it('should parse fully signed tx', () => {
-      const txHex = '0100000001a90410eca88f858aa6b639980d67fb19549f87ce8b2b4aae4cfaeb426e679be6000000006a21025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf1473044022008ab745f9aaf9be937ab2575040fdefccaa19149587c436264dffb072018a73a0220476971acfa84be890a4064baccefbb2d45e328e2079a3a3a447264212cfbe35501ffffffff0200000000000000000200bb0000000000000000246a2201037334a4e8aea91bce5e48d75cdd2852c31b77ab9a2549bebc0be3e3f5116e53c800000000';
+      const txHex = '0100000001f6fd3a0bc0ef64ad72e6944248f0fd0c0e390fb57e3b98756c76ab97b5a6d28b01000000d521025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf147304402202f820137b753af072bff90b19fcac88ed87a5cc621996b61c106bf366da969f902202568adff157c00832fd5161f3f9f2442a62e81b3b400dab98dbdeec093e313d60121038ef4a121bcaf1b1f175557a12896f8bc93b095e84817f90e9a901cd2113a8202483045022100e0dbaa5dd22019a4803598296a19fcc362d22ca28b2aeddc3e03efcf8dee87f3022049ce0fd6a80265e3ebb56ee6e9edb417dc4f0c08eaf2eb77228a151461710d2801ffffffff0200ca9a3b000000001a52141ebcb5ece0b688030060248ce0e20a1360d0ce4e515253ba0000000000000000076a05deadbeef0100000000';
       const tx = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(tx);
       console.log('here');
+    });
+
+    it('should convert xpubs to pubs', () => {
+      const xpubs = [
+        'xpub661MyMwAqRbcF8HRs1uRCMowgXAcgLikNehXMeknF5xVtrRXKUNGsYmipVepmwW5xYxGJm6yWcPULn78vfRh8XuMhoCizcGq22QgEJzo4RM',
+        'xpub661MyMwAqRbcFH3PRxJoK2HKXJciGBLws6YquoSSbxmEnxF3LECSRV1zzzCe215GePPLnpYHEDQTj9hodKgr9eDuy5d5VHpe1pqfBdZFVYY',
+        'xpub661MyMwAqRbcF2pZk4p8SM8HRvYMBN9U1igjiBcx9oEdRKRHFGs7zhwaWy4zCycUQgg4fDdjWbQrTRbxRydgBkwm8pM9A2YU2FVJVt6itYD',
+        'xpub661MyMwAqRbcFfEjB1Wj6i3V9oHD6M5ePZLD72Fkoga8nHupKxxGUEpk3AwS3JskPoHs4rpQJMRfmCp6MVuPBZYU6cTQw4Q6EQysFER3Fhp',
+      ];
+      for (const xpub of xpubs) {
+        // const xpub = 'xpub6DJUKjodfWbUT9tAL9NC1kWiN8PYMz7dcoX5T3NNfR2UdAqKmjCKE7ZcmmYygQcxWVMaZquJ5UGai1xtT5poEog6GwDop4KyY3QwxNbtCmq';
+        const ecPair = prova.HDNode.fromBase58(xpub).getKey();
+        const pub = ecPair.getPublicKeyBuffer();
+        console.log(pub.toString('hex'));
+      }
     });
   });
 
