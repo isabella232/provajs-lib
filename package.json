@@ -1,6 +1,6 @@
 {
-  "name": "prova",
-  "version": "0.0.1",
+  "name": "prova-lib",
+  "version": "0.1.0",
   "description": "Library for interacting with Prova-blockchain-secured assets",
   "main": "index.js",
   "scripts": {
