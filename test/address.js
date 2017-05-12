@@ -1,9 +1,13 @@
 const assert = require('assert');
 const prova = require('../index');
 const bitcoin = require('bitcoinjs-lib');
+const _ = require('lodash');
 
 describe('Address', function () {
   describe('RMG Base58 check', function() {
+
+    const keyIDs = [33554432, 16777216];
+
     it('validates p2pk uncompressed', function() {
       const network = 0;
       const publicKey = new Buffer([0x04, 0x11, 0xdb, 0x93, 0xe1, 0xdc, 0xdb, 0x8a, 0x01, 0x6b,
@@ -108,7 +112,6 @@ describe('Address', function () {
     });
 
     it('validates p2sh', function() {
-
       const script = new Buffer([
         0x52, 0x41, 0x04, 0x91, 0xbb, 0xa2, 0x51, 0x09, 0x12, 0xa5,
         0xbd, 0x37, 0xda, 0x1f, 0xb5, 0xb1, 0x67, 0x30, 0x10, 0xe4,
@@ -140,101 +143,89 @@ describe('Address', function () {
       assert.strictEqual(address, base58Output);
     });
 
-    it('assembles Aztec address', function() {
+    it('assembles Prova address', function() {
       const keyHash = new Buffer([0, 248, 21, 176, 54, 217, 187, 188, 229, 233, 242, 160, 10, 189, 27, 243, 220, 145, 233, 85]);
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
       const network = prova.networks.rmg;
-
       const inputBuffer = new Buffer(2 * 4 + 20); // keyID is 4, and key hash is 20
       inputBuffer.fill(0);
       keyHash.copy(inputBuffer, 0);
-      inputBuffer.writeUInt32LE(keyID1, 20);
-      inputBuffer.writeUInt32LE(keyID2, 24);
-
-
+      inputBuffer.writeUInt32LE(keyIDs[0], 20);
+      inputBuffer.writeUInt32LE(keyIDs[1], 24);
       const address = 'G9mwJwfrhveVw4kjLYaQymjxiH3xXp9VdzXdW5QeyFcTy';
       const aztecAddress = prova.Address.fromBuffer(inputBuffer, network);
       const base58Output = aztecAddress.toString();
       assert.strictEqual(address, base58Output);
     });
 
-    it('assembles Aztec address from function', function() {
-
+    it('assembles Prova address from function', function() {
       const publicKey = new Buffer([0x02, 0x19, 0x2d, 0x74, 0xd0, 0xcb, 0x94, 0x34, 0x4c, 0x95,
         0x69, 0xc2, 0xe7, 0x79, 0x01, 0x57, 0x3d, 0x8d, 0x79, 0x03,
         0xc3, 0xeb, 0xec, 0x3a, 0x95, 0x77, 0x24, 0x89, 0x5d, 0xca,
         0x52, 0xc6, 0xb4]);
 
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
-
-      const aztecAddress = new prova.Address(publicKey, keyID1, keyID2, prova.networks.rmg);
+      const aztecAddress = new prova.Address(publicKey, keyIDs, prova.networks.rmg);
       const addressString = 'GBL76k8VZUsqrLgomr3sY657AF4Bk5qm836nH266nv1yY';
       assert.strictEqual(addressString, aztecAddress.toString());
     });
 
-    it('assembles Aztec address with HDNode', function() {
+    it('constructor bad args', function() {
+      assert.throws(function() { new prova.Address(null, null) });
+      assert.throws(function() { new prova.Address(null, []) });
+      assert.throws(function() { new prova.Address(null, [1]) });
+      assert.throws(function() { new prova.Address(null, _.range(0, 20)) });
+      assert.throws(function() { new prova.Address(null, [-1, -2]) });
+      assert.throws(function() { new prova.Address(null, [0, 'a']) });
+    });
 
+    it('assembles maximal Prova address', function() {
+      const k = prova.ECPair.fromPublicKeyBuffer(new Buffer('02b62b464b50898b00ac470eb9ef2f68531b78322c9510ea71b9e6c69ac610d273', 'hex'));
+      const addr = new prova.Address(k, _.range(0, 19));
+      assert.strictEqual(addr.toString(), '9ubeG9ULdd1M9QY7zUjFBPwAQiwFzBh2o9hjg3ezZnbGzm1pqvHTj2cSSaiku9txCyLmBoSWrmoGpyq1VbNRZ6QVPzweS7s1LoeGbdtwe5BcdC8tzeXmg8NYQ4d7z5iY28mT85Sqxk');
+      const addr2 = prova.Address.fromBase58('9ubeG9ULdd1M9QY7zUjFBPwAQiwFzBh2o9hjg3ezZnbGzm1pqvHTj2cSSaiku9txCyLmBoSWrmoGpyq1VbNRZ6QVPzweS7s1LoeGbdtwe5BcdC8tzeXmg8NYQ4d7z5iY28mT85Sqxk');
+      assert.strictEqual(addr.publicKeyHash.toString('hex'), addr2.publicKeyHash.toString('hex'));
+      assert.strictEqual(addr2.toString(), addr.toString());
+    });
+
+    it('assembles Prova address with HDNode', function() {
       const hdNode = prova.HDNode.fromSeedBuffer(new Buffer('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'), prova.networks.rmg);
-
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
-
-      const aztecAddress = new prova.Address(hdNode, keyID1, keyID2, prova.networks.rmg);
+      const aztecAddress = new prova.Address(hdNode, keyIDs, prova.networks.rmg);
       const addressString = 'GCpCNnjoNyt9TPo9Rfu6MLtNDX47ELbqdDU6z5joF7nhS';
       assert.strictEqual(addressString, aztecAddress.toString());
     });
 
-    it('assembles Aztec address with xpub', function() {
-
+    it('assembles Prova address with xpub', function() {
       const xpub = 'xpub661MyMwAqRbcFXFu3j49biFNZYZmPALfK3yPei94zrJfyZy38yNs6VmWy65VouoMMAiQ5ZyS131M7i4RWXa88VUdTfduuH3FFRxNMpPfTSY';
-
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
-
-      const aztecAddress = new prova.Address(xpub, keyID1, keyID2, prova.networks.rmg);
+      const aztecAddress = new prova.Address(xpub, keyIDs, prova.networks.rmg);
       const addressString = 'GFDFqYMcz4MhzeQvaosNDVKazDx9yQ8TzqtianpbN1SFc';
       assert.strictEqual(addressString, aztecAddress.toString());
     });
 
-    it('assembles Aztec address with HDNode', function() {
-
+    it('assembles Prova address with HDNode', function() {
       const xpub = 'xpub661MyMwAqRbcFXFu3j49biFNZYZmPALfK3yPei94zrJfyZy38yNs6VmWy65VouoMMAiQ5ZyS131M7i4RWXa88VUdTfduuH3FFRxNMpPfTSY';
       const hdNode = prova.HDNode.fromBase58(xpub);
-
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
-
-      const aztecAddress = new prova.Address(hdNode, keyID1, keyID2, prova.networks.rmg);
+      const aztecAddress = new prova.Address(hdNode, keyIDs, prova.networks.rmg);
       const addressString = 'GFDFqYMcz4MhzeQvaosNDVKazDx9yQ8TzqtianpbN1SFc';
       assert.strictEqual(addressString, aztecAddress.toString());
     });
 
-    it('assembles Aztec address with xpub and xprv', function() {
-
+    it('assembles Prova address with xpub and xprv', function() {
       const xprv = 'xprv9s21ZrQH143K3YbWtKTYyi6qx9FT14u5wowHU13pxS12jT84hhA8gNdZHL28iyfSAkd4sAiRanRwzJ3bRykUvmwDMAKp9gFwRAAmLuBpULA';
       const xpub = 'xpub661MyMwAqRbcG2fyzLzZLr3aWB5wQXcwK2rtGPTSWmY1cFTDFEUPEAx38dBg9TxiKxEQQTAr3Nfyy25VqYFzg5d2E5J95D9XxVbVq5BsF3Z';
-
-      const keyID1 = 33554432;
-      const keyID2 = 16777216;
-
-      const aztecAddress1 = new prova.Address(xpub, keyID1, keyID2, prova.networks.rmg);
-      const aztecAddress2 = new prova.Address(xprv, keyID1, keyID2, prova.networks.rmg);
+      const aztecAddress1 = new prova.Address(xpub, keyIDs, prova.networks.rmg);
+      const aztecAddress2 = new prova.Address(xprv, keyIDs, prova.networks.rmg);
       const addressString = 'GHhkNgqmMjwUjVYmsRjW281HhFRXuSX5cuFQc4C88Esyi';
       assert.strictEqual(aztecAddress1.toString(), aztecAddress2.toString());
       assert.strictEqual(addressString, aztecAddress1.toString());
     });
 
-    it('reassembles Aztec address from string', function() {
-
+    it('reassembles Prova address from string', function() {
       const addressString = 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH';
       const aztecAddress = prova.Address.fromBase58(addressString);
       assert.strictEqual(aztecAddress.publicKeyHash.toString('hex'), '7ef3c5b03eb6a485ff34a31da7266c0a0e180daf');
       assert.strictEqual(aztecAddress.toString(), 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH');
     });
 
-    it('assembles Aztec address from odd script', function() {
+    it('assembles Prova address from odd script', function() {
       const script = Buffer.from('5214ddaa0c1d6a65f5c38444a1b5bf6779d00d2b4fc4005153ba', 'hex');
       const aztecAddress = prova.Address.fromScript(script);
       const addressString = aztecAddress.toString(prova.networks.rmgTest);
@@ -242,26 +233,25 @@ describe('Address', function () {
       const restoredScript = prova.Address.fromBase58(addressString).toScript();
       assert.strictEqual(addressString, expectedString);
       assert.strictEqual(script.toString('hex'), restoredScript.toString('hex'));
-
     });
 
-    it('validates Aztec address', function() {
+    it('validates Prova address', function() {
       // const addressString = 'GHhkNgqmMjwUjVYmsRjW281HhFRXuSX5cuFQc4C88Esyi';
       const addressString = 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH';
       assert.strictEqual(prova.Address.validateBase58(addressString, prova.networks.rmgTest), true);
     });
 
-    it('validates wrong network Aztec address', function() {
+    it('validates wrong network Prova address', function() {
       // const addressString = 'GHhkNgqmMjwUjVYmsRjW281HhFRXuSX5cuFQc4C88Esyi';
       const addressString = 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH';
       assert.strictEqual(prova.Address.validateBase58(addressString, prova.networks.rmg), false);
     });
 
-    it('validates fake Aztec address', function() {
+    it('validates fake Prova address', function() {
       const addressString = 'BY2gSkDjm3BgSNEFBnvfH2UTMFXEjXBx7AS9QHTJiejCe';
       assert.strictEqual(prova.Address.validateBase58(addressString, prova.networks.rmgTest), false);
     });
-    it('validates fake Aztec address', function() {
+    it('validates fake Prova address', function() {
       const addressString = 'BY2gSkDjm3BgSNEFBnvfH2UTMFXEjXBx7AS9QHTJiejCi';
       assert.strictEqual(prova.Address.validateBase58(addressString, prova.networks.rmgTest), false);
     });

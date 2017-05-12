@@ -5,45 +5,46 @@ const networks = require('./networks');
 const OPS = require('./ops');
 const ECPair = require('./ecPair');
 const HDNode = require('./hdNode');
-const typeforce = require('typeforce');
-const types = require('./types');
 
-const PROVA_ENCODED_PAYLOAD_LENGTH = 29;
-const PROVA_RAW_PAYLOAD_LENGTH = 28;
+const MIN_ENCODED_PAYLOAD_LENGTH = 29;
+const MIN_KEYIDS = 2;
+const MAX_KEYIDS = 19;
+const KEYHASH_SIZE = 20;
+const KEYID_SIZE = 4;
 
 const fromBase58CheckAztec = (address) => {
   const payload = bs58check.decode(address);
-  if (payload.length < PROVA_ENCODED_PAYLOAD_LENGTH) {
+  if (payload.length < MIN_ENCODED_PAYLOAD_LENGTH) {
     throw new TypeError(address + ' is too short');
-  }
-  if (payload.length > PROVA_ENCODED_PAYLOAD_LENGTH) {
-    throw new TypeError(address + ' is too long');
   }
 
   const version = payload[0];
-  const hash = payload.slice(1);
+  const buffer = payload.slice(1);
 
-  return { hash, version };
+  return { buffer, version };
 };
 
-const toBase58CheckAztec = (hash, version) => {
-  const payload = new Buffer(PROVA_ENCODED_PAYLOAD_LENGTH);
+const toBase58CheckAztec = (buf, version) => {
+  const payload = new Buffer(1 + buf.length);
   payload.writeUInt8(version, 0);
-  hash.copy(payload, 1);
+  buf.copy(payload, 1);
 
   return bs58check.encode(payload);
 };
 
+/**
+ * This class represents a standard Aztec address which must represent a script of the form:
+ *   n-1 <keyhash> <n-1 keyids> n OP_CHECKSAFEMULTISIG
+ */
 class Address {
   /**
    *
    * @param publicKey
-   * @param keyID1
-   * @param keyID2
+   * @param keyIDs
    * @param network
    * @constructor
    */
-  constructor(publicKey, keyID1, keyID2, network = networks.rmg) {
+  constructor(publicKey, keyIDs, network = networks.rmg) {
     // store the preferred network for outputs
     this.network = network;
 
@@ -52,9 +53,18 @@ class Address {
       this.setPublicKey(publicKey);
     }
 
+    if (!keyIDs || keyIDs.length < 2 || keyIDs.length > 19) {
+      throw new Error('invalid number of key ids');
+    }
+
+    keyIDs.forEach(function(keyID) {
+      if (typeof(keyID) !== 'number' || keyID < 0 || keyID > Math.pow(2,31)) {
+        throw new Error('invalid keyid');
+      }
+    });
+
     // store the cosigner key ids
-    this.keyID1 = keyID1;
-    this.keyID2 = keyID2;
+    this.keyIDs = keyIDs.slice(0);
   }
 
   static fromBase58(base58) {
@@ -68,66 +78,92 @@ class Address {
       network = networks.rmgTest;
     }
 
-    return Address.fromBuffer(components.hash, network);
+    return Address.fromBuffer(components.buffer, network);
   }
 
-  static validateBase58(base58, network = networks.rmg) {
-    let components;
+  static validateBase58(base58, network=networks.rmg) {
     try {
-      components = fromBase58CheckAztec(base58);
+      const addr = Address.fromBase58(base58, network);
+      return addr.network === network;
     } catch (e) {
       return false;
     }
-    const buffer = components.hash;
-    const version = components.version;
-    if (version !== network.rmg) {
-      // invalid network
-      return false;
-    }
-    if (buffer.length != PROVA_RAW_PAYLOAD_LENGTH) {
-      return false;
-    }
-    return true;
   }
 
   static fromScript(script, network) {
     const components = bscript.decompile(script);
+    const len = components.length;
+    if (len < 6) {
+      throw new Error('invalid script format');
+    }
+    const m = bscript.decodeNumber(components[0]);
+    if (!m || m < MIN_KEYIDS || m > MAX_KEYIDS) {
+      throw new Error('invalid m value in script');
+    }
     const keyHash = components[1];
-    const keyID1 = bscript.decodeNumber(components[2]);
-    const keyID2 = bscript.decodeNumber(components[3]);
+    const keyIDCount = components.length - 4; /* subtract out m, keyhash, n and OP_CHECKSAFEMULTISIG */
+    const op = components[len-1];
+    if (op !== OPS.OP_CHECKSAFEMULTISIG) {
+      throw new Error('Expected OP_CHECKSAFEMULTISIG');
+    }
+    const keyIDs = components.slice(2, 2+keyIDCount).map(bscript.decodeNumber);
+    const n = bscript.decodeNumber(components[len-2]);
+    if (n !== m+1) {
+      throw new Error('n must be equal to m+1');
+    }
+    if (n !== keyIDCount + 1) {
+      throw new Error('n inconsistent with number of keys');
+    }
 
-    const address = new Address(null, keyID1, keyID2, network);
+    const address = new Address(null, keyIDs, network);
     address.setPublicKeyHash(keyHash);
     return address;
   }
 
   static fromBuffer(buffer, network) {
+    const len = buffer.length;
+    const keyIDCount = (len - KEYHASH_SIZE) / KEYID_SIZE;
+    if (Math.floor(keyIDCount) !== keyIDCount) {
+      throw new Error('unexpected buffer length: ' + len);
+    }
+    const keyHash = buffer.slice(0, KEYHASH_SIZE);
+    let pos = KEYHASH_SIZE;
+    const keyIDs = [];
+    for (let i=0; i < keyIDCount; i++) {
+      keyIDs.push(buffer.readUInt32LE(pos));
+      pos += KEYID_SIZE;
+    }
 
-    const keyHash = buffer.slice(0, 20);
-    const keyID1 = buffer.readUInt32LE(20);
-    const keyID2 = buffer.readUInt32LE(24);
-
-    const address = new Address(null, keyID1, keyID2, network);
+    const address = new Address(null, keyIDs, network);
     address.setPublicKeyHash(keyHash);
     return address;
+  }
 
+  totalKeys() {
+    return 1 + this.keyIDs.length;
+  }
+
+  signaturesNeeded() {
+    return this.totalKeys() - 1;
   }
 
   toScript() {
     const components = [
-      OPS.OP_2,
-      this.publicKeyHash,
-      bscript.encodeNumber(this.keyID1),
-      bscript.encodeNumber(this.keyID2),
-      OPS.OP_3,
+      bscript.encodeNumber(this.signaturesNeeded()),
+      this.publicKeyHash
+    ]
+    .concat(this.keyIDs.map(bscript.encodeNumber))
+    .concat([
+      bscript.encodeNumber(this.totalKeys()),
       OPS.OP_CHECKSAFEMULTISIG
-    ];
+    ]);
     return bscript.compile(components);
-  };
+  }
 
   setPublicKey(publicKey) {
-
-    if (Buffer.isBuffer(publicKey)) {
+    if (publicKey instanceof ECPair) {
+      this.publicKey = publicKey;
+    } else if (Buffer.isBuffer(publicKey)) {
       this.publicKey = ECPair.fromPublicKeyBuffer(publicKey);
     } else if (publicKey instanceof HDNode) {
       return this.setPublicKey(publicKey.getPublicKeyBuffer());
@@ -147,11 +183,14 @@ class Address {
   }
 
   toBuffer() {
-    const inputBuffer = new Buffer(PROVA_RAW_PAYLOAD_LENGTH); // keyID is 4, and key hash is 20
+    const inputBuffer = new Buffer(KEYHASH_SIZE + this.keyIDs.length * KEYID_SIZE);
     inputBuffer.fill(0); // initialize it with all zeroes
     this.publicKeyHash.copy(inputBuffer, 0);
-    inputBuffer.writeUInt32LE(this.keyID1, 20);
-    inputBuffer.writeUInt32LE(this.keyID2, 24);
+    let pos = KEYHASH_SIZE;
+    this.keyIDs.forEach(function(keyID) {
+      inputBuffer.writeUInt32LE(keyID, pos);
+      pos += KEYID_SIZE;
+    });
     return inputBuffer;
   }
 
