@@ -15,8 +15,10 @@ const Network = typeforce.compile({
     public: typeforce.UInt32,
     private: typeforce.UInt32
   },
-  rmg: typeforce.UInt8,
-  wif: typeforce.UInt8
+  pubKeyHash: typeforce.maybe(typeforce.UInt8),
+  rmg: typeforce.maybe(typeforce.UInt8),
+  scriptHash: typeforce.maybe(typeforce.UInt8),
+  wif: typeforce.maybe(typeforce.UInt8)
 });
 
 // extend typeforce types with ours

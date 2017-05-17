@@ -18,6 +18,15 @@ try {
 
 const HDNode = bitcoin.HDNode;
 
+const inferredNetworks = [
+  NETWORKS.rmg,
+  NETWORKS.rmgTest,
+  bitcoin.networks.bitcoin,
+  bitcoin.networks.testnet,
+  bitcoin.networks.litecoin,
+  NETWORKS.litecoinTest
+];
+
 HDNode.prototype.neutered = function() {
   const neuteredKeyPair = new ECPair(null, this.keyPair.Q, {
     network: this.keyPair.network
@@ -31,8 +40,11 @@ HDNode.prototype.neutered = function() {
   return neutered;
 };
 
-HDNode.prototype.getKey = function(network = this.keyPair.network || NETWORKS.rmg) {
+HDNode.prototype.getKey = function(overrideNetwork) {
+  typeforce(types.maybe(types.Network), overrideNetwork);
+
   const k = this.keyPair;
+  const network = overrideNetwork || this.keyPair.network || NETWORKS.rmg;
   const result = new ECPair(k.d, k.d ? null : k.Q, { network: network, compressed: k.compressed });
   // Creating Q from d takes ~25ms, so if it's not created, use native bindings to pre-compute
   if (!result.__Q && secp256k1) {
@@ -221,7 +233,7 @@ HDNode.prototype.derive = function(index) {
   return hd;
 };
 
-HDNode.fromBase58 = function(string, networks) {
+HDNode.fromBase58 = function(string, networks = inferredNetworks) {
   const buffer = base58check.decode(string);
   if (buffer.length !== 78) {
     throw new Error('Invalid buffer length');
