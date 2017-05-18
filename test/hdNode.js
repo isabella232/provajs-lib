@@ -289,6 +289,13 @@ describe('HDNode', function() {
       xpub.should.equal('xpub661MyMwAqRbcEoSfZ6tJHwqUQguArCdyMYzvKnLa8uUra3tvbA99Nmpn83s9dwotjLpZNUtRWviRAE4bFfyTbirRESCCPUrmfz9y8JsBCuc');
     });
 
+    it('should obtain xpub from potentially non-zero-padded xprv', function() {
+      const prv = 'xprv9s21ZrQH143K2wzTkqpwwJguJVpxDqq78RCRmq8aVtmPVLd1BZTx2jqEDdu5Xnd9532qefTXYeZFoJN3zBDn7ipkHtL9accNqQP1Nrwgndn';
+      const keychain = prova.HDNode.fromBase58(prv, prova.networks.rmgTest);
+      const xpub = keychain.neutered().toBase58();
+      xpub.should.equal('xpub661MyMwAqRbcFS4vrsMxJSddrXfSdJYxVe82aDYC4EJNN8x9j6nCaY9i4xGyLkV97gE9TKF1Mv6sDMmWGXvN8tTu3pPDCoCGCwqTXUeSHJm');
+    });
+
     it('should be able to generate both xpub and xprv', function() {
       const keychain = prova.HDNode.fromSeedBuffer(new Buffer('somesuperrandomseedbuffer'));
       const xprv = keychain.toBase58();

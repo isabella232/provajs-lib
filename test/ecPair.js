@@ -38,4 +38,14 @@ describe('ECPair', function() {
     const prvHex = ecKey.getPrivateKeyBuffer().toString('hex');
     const pubHex = ecKey.getPublicKeyBuffer().toString('hex');
   });
+
+  it('test public key length', function() {
+    for (let i = 0; i < 50; i++) {
+      const ecPair = prova.ECPair.makeRandom();
+      const publicKey = ecPair.getPublicKeyBuffer();
+      if (publicKey.length !== 33) {
+        throw new Error('invalid public key buffer length');
+      }
+    }
+  });
 });

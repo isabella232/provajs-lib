@@ -33,6 +33,37 @@ describe('Transaction Builder', function() {
     assert.strictEqual(builder.build().toHex(), fullySignedHex);
   });
 
+
+  it('should half-sign and recover unsigned transaction with padding-optional HDNode', function() {
+    const txHex = '01000000018ff8476a60aaf5af8fb9fcf76430e07d53c8d3be512c78ebd42456711dddf9a60000000000ffffffff0100f2052a010000001d521435dbbf04bca061e49dace08f858d8775c0a57c8e030000015153ba00000000';
+    const transaction = prova.Transaction.fromHex(txHex);
+    const builder = prova.TransactionBuilder.fromTransaction(transaction, prova.networks.rmg);
+    assert.strictEqual(builder.inputs.length, 1);
+    const input = builder.inputs[0];
+    assert.strictEqual(input.pubKeys.length, 0);
+    assert.strictEqual(input.signatures.length, 0);
+    // obtain signing prerequisites
+    const keyPair1 = prova.HDNode.fromBase58('xprv9s21ZrQH143K2wzTkqpwwJguJVpxDqq78RCRmq8aVtmPVLd1BZTx2jqEDdu5Xnd9532qefTXYeZFoJN3zBDn7ipkHtL9accNqQP1Nrwgndn', prova.networks.rmg)
+    .getKey();
+    const coinbase = prova.Transaction.fromHex('01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0d510b2f503253482f627463642fffffffff0200f2052a010000001d521435dbbf04bca061e49dace08f858d8775c0a57c8e030000015153ba0000000000000000026a5100000000');
+    builder.signWithTx(0, keyPair1, coinbase);
+    // signatures should now be extended
+    assert.strictEqual(input.pubKeys.length, 1);
+    assert.strictEqual(input.signatures.length, 1);
+    assert.strictEqual(input.pubKeys[0].length, 33);
+    assert.strictEqual(input.signatures[0].length, 71);
+    const halfSignedHex = '01000000018ff8476a60aaf5af8fb9fcf76430e07d53c8d3be512c78ebd42456711dddf9a6000000006a2103b9b9b2045f7fb10b26e9047f7cbe392be7dad7e5633ecbb4b12944f1d430938c47304402201bcbeedda20d454b79fab03dec1ce2e41adf52a6fdb031a3d54c10f811747b0d02202f4a0c58bea219678ed58dd7039803ed2bdaf8b2ac6aa1e5f126468c05ac1c5601ffffffff0100f2052a010000001d521435dbbf04bca061e49dace08f858d8775c0a57c8e030000015153ba00000000';
+    assert.strictEqual(builder.buildIncomplete().toHex(), halfSignedHex);
+
+    const recoveredTx = prova.Transaction.fromHex(halfSignedHex);
+    const recoveredBuilder = prova.TransactionBuilder.fromTransaction(recoveredTx);
+    assert.strictEqual(recoveredBuilder.inputs.length, 1);
+    assert.strictEqual(recoveredBuilder.inputs[0].pubKeys.length, 1);
+    assert.strictEqual(recoveredBuilder.inputs[0].signatures.length, 1);
+    assert.strictEqual(recoveredBuilder.inputs[0].pubKeys[0].toString('hex'), keyPair1.getPublicKeyBuffer()
+    .toString('hex'));
+  });
+
   it('should build a transaction from scratch', function() {
     const builder = new prova.TransactionBuilder(prova.networks.rmg);
     const coinbase = prova.Transaction.fromHex('01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0d510b2f503253482f627463642fffffffff0200f2052a010000001d521435dbbf04bca061e49dace08f858d8775c0a57c8e030000015153ba0000000000000000026a5100000000');

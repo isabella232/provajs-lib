@@ -66,7 +66,16 @@ ECPair.prototype.getPrivateKeyBuffer = function() {
   if (!this.d) {
     throw new Error('private key unknown');
   }
-  return this.d.toBuffer();
+  const bigIntBuffer = this.d.toBuffer();
+  if (bigIntBuffer.length > 32) {
+    throw new Error('private key size exceeds 32 bytes');
+  }
+  if (bigIntBuffer.length === 32) {
+    return bigIntBuffer;
+  }
+  const buffer = Buffer.alloc(32);
+  bigIntBuffer.copy(buffer, buffer.length - bigIntBuffer.length, 0, bigIntBuffer.length);
+  return buffer;
 };
 
 module.exports = ECPair;
