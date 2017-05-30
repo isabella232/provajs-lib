@@ -146,7 +146,11 @@ Transaction.prototype.__toBuffer = function(buffer, initialOffset = 0, __allowWi
 };
 
 Transaction.prototype.hashForWitnessV0 = function(inIndex, prevOutScript, value, hashType) {
-  typeforce(types.tuple(types.UInt32, types.Buffer, types.Satoshi, types.UInt32), arguments);
+  try {
+    typeforce(types.tuple(types.UInt32, types.Buffer, types.Satoshi, types.UInt32), arguments);
+  } catch (e) {
+    throw new Error(e.message);
+  }
 
   let tbuffer, toffset;
   const writeSlice = (slice) => { toffset += slice.copy(tbuffer, toffset); };

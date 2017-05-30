@@ -41,7 +41,11 @@ HDNode.prototype.neutered = function() {
 };
 
 HDNode.prototype.getKey = function(overrideNetwork) {
-  typeforce(types.maybe(types.Network), overrideNetwork);
+  try {
+    typeforce(types.maybe(types.Network), overrideNetwork);
+  } catch (e) {
+    throw new Error(e.message);
+  }
 
   const k = this.keyPair;
   const network = overrideNetwork || this.keyPair.network || NETWORKS.rmg;
@@ -104,7 +108,11 @@ HDNode.prototype.hdPath = function() {
 };
 
 HDNode.prototype.deriveSlow = function(index) {
-  typeforce(types.UInt32, index);
+  try {
+    typeforce(types.UInt32, index);
+  } catch (e) {
+    throw new Error(e.message);
+  }
 
   const isHardened = index >= HDNode.HIGHEST_BIT;
   const data = new Buffer(37);
@@ -256,6 +264,11 @@ HDNode.fromBase58 = function(string, networks = inferredNetworks) {
 
     // otherwise, assume a network object (or default to rmg)
   } else {
+    try {
+      typeforce(types.maybe(types.Network), networks);
+    } catch (e) {
+      throw new Error(e.message);
+    }
     network = networks || NETWORKS.rmg;
   }
 
@@ -315,7 +328,11 @@ HDNode.fromBase58 = function(string, networks = inferredNetworks) {
 };
 
 HDNode.fromSeedBuffer = function(seed, network = NETWORKS.rmg) {
-  typeforce(types.tuple(types.Buffer, types.maybe(types.Network)), arguments);
+  try {
+    typeforce(types.tuple(types.Buffer, types.maybe(types.Network)), arguments);
+  } catch (e) {
+    throw new Error(e.message);
+  }
 
   if (seed.length < 16) {
     throw new TypeError('Seed should be at least 128 bits');

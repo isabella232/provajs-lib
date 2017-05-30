@@ -8,10 +8,14 @@ const typeforce = require('typeforce');
 const types = require('./types');
 
 const ECPair = function ECPair(d, Q, options = {}) {
-  typeforce({
-    compressed: types.maybe(types.Boolean),
-    network: types.maybe(types.Network)
-  }, options);
+  try {
+    typeforce({
+      compressed: types.maybe(types.Boolean),
+      network: types.maybe(types.Network)
+    }, options);
+  } catch (e) {
+    throw new Error(e.message);
+  }
 
   if (d) {
     if (d.signum() <= 0) {
@@ -26,7 +30,11 @@ const ECPair = function ECPair(d, Q, options = {}) {
 
     this.d = d;
   } else {
-    typeforce(types.ECPoint, Q);
+    try {
+      typeforce(types.ECPoint, Q);
+    } catch (e) {
+      throw new Error(e.message);
+    }
 
     this.__Q = Q;
   }
@@ -47,7 +55,11 @@ ECPair.fromPublicKeyBuffer = function(buffer, network) {
 };
 
 ECPair.fromPrivateKeyBuffer = function(buffer, network) {
-  typeforce(typeforce.BufferN(32), buffer);
+  try {
+    typeforce(typeforce.BufferN(32), buffer);
+  } catch (e) {
+    throw new Error(e.message);
+  }
   const d = BigInteger.fromBuffer(buffer);
 
   if (d.signum() <= 0 || d.compareTo(secp256k1.n) >= 0) {
