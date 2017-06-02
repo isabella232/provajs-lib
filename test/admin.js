@@ -5,7 +5,7 @@ const script = require('../src/script');
 describe('Admin', function() {
   describe('Funds Issuing Keys', function() {
     it('add issuing key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000200bb0000000000000000246a22bd025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000200bb0000000000000000246a2201025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       assert.strictEqual(transaction.outs[0].isAdminThreadOutput, true);
       assert.strictEqual(transaction.outs[0].adminThread, 0);
@@ -24,7 +24,7 @@ describe('Admin', function() {
     });
 
     it('revoke issuing key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000200bb0000000000000000246a22be025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000200bb0000000000000000246a2202025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -39,7 +39,7 @@ describe('Admin', function() {
     });
 
     it('add provisioning key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000200bb0000000000000000246a22bf025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000200bb0000000000000000246a2203025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -54,7 +54,7 @@ describe('Admin', function() {
     });
 
     it('revoke provisioning key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000200bb0000000000000000246a22c0025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000200bb0000000000000000246a2204025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -69,7 +69,7 @@ describe('Admin', function() {
     });
 
     it('add validating key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000251bb0000000000000000246a22c1025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000251bb0000000000000000246a2211025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -84,7 +84,7 @@ describe('Admin', function() {
     });
 
     it('revoke validating key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000251bb0000000000000000246a22c2025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
+      const txHex = '01000000000200000000000000000251bb0000000000000000246a2212025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf100000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -101,7 +101,7 @@ describe('Admin', function() {
 
   describe('Account Service Provider Keys', function() {
     it('add ASP key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000251bb0000000000000000286a26c3025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf10000010000000000';
+      const txHex = '01000000000200000000000000000251bb0000000000000000286a2613025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf10000010000000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 
@@ -116,7 +116,7 @@ describe('Admin', function() {
     });
 
     it('revoke ASP key', function() {
-      const txHex = '0100000001b0c40ddce1f8e15390517dfe848a7db1c16fd77ff0fa599dba75cb6a8f6fb1a90000000000ffffffff0200000000000000000251bb0000000000000000286a26c4025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf10000010000000000';
+      const txHex = '01000000000200000000000000000251bb0000000000000000286a2614025ceeba2ab4a635df2c0301a3d773da06ac5a18a7c3e0d09a795d7e57d233edf10000010000000000';
       const transaction = prova.Transaction.fromHex(txHex);
       const builder = prova.TransactionBuilder.fromTransaction(transaction);
 

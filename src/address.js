@@ -58,7 +58,7 @@ class Address {
     }
 
     keyIDs.forEach(function(keyID) {
-      if (typeof(keyID) !== 'number' || keyID < 0 || keyID > 0x80000000) {
+      if (typeof(keyID) !== 'number' || keyID < 0 || keyID > 0xffffffff) {
         throw new Error('invalid keyid');
       }
     });
