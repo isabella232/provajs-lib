@@ -58,13 +58,14 @@ class Address {
     }
 
     keyIDs.forEach(function(keyID) {
-      if (typeof(keyID) !== 'number' || keyID < 0 || keyID > Math.pow(2,31)) {
+      if (typeof(keyID) !== 'number' || keyID < 0 || keyID > 0x80000000) {
         throw new Error('invalid keyid');
       }
     });
 
     // store the cosigner key ids
     this.keyIDs = keyIDs.slice(0);
+    this.signatureCount = this.keyIDs.length;
   }
 
   static fromBase58(base58) {
@@ -72,16 +73,16 @@ class Address {
 
     let network;
     const version = components.version;
-    if (version == networks.rmg.rmg) {
+    if (version === networks.rmg.rmg) {
       network = networks.rmg;
-    } else if (version == networks.rmgTest.rmg) {
+    } else if (version === networks.rmgTest.rmg) {
       network = networks.rmgTest;
     }
 
     return Address.fromBuffer(components.buffer, network);
   }
 
-  static validateBase58(base58, network=networks.rmg) {
+  static validateBase58(base58, network = networks.rmg) {
     try {
       const addr = Address.fromBase58(base58, network);
       return addr.network === network;
@@ -92,31 +93,37 @@ class Address {
 
   static fromScript(script, network) {
     const components = bscript.decompile(script);
-    const len = components.length;
-    if (len < 6) {
+    const length = components.length;
+    if (length < 6) {
       throw new Error('invalid script format');
     }
-    const m = bscript.decodeNumber(components[0]);
-    if (!m || m < MIN_KEYIDS || m > MAX_KEYIDS) {
-      throw new Error('invalid m value in script');
+
+    const signatureCount = bscript.decodeNumber(components[0]);
+    if (!signatureCount || signatureCount < MIN_KEYIDS || signatureCount > MAX_KEYIDS) {
+      throw new Error('invalid signatureCount value in script');
     }
     const keyHash = components[1];
-    const keyIDCount = components.length - 4; /* subtract out m, keyhash, n and OP_CHECKSAFEMULTISIG */
-    const op = components[len-1];
-    if (op !== OPS.OP_CHECKSAFEMULTISIG) {
+    const keyIDCount = components.length - 4;
+
+    /* subtract out signatureCount, keyhash, keyCount and OP_CHECKSAFEMULTISIG */
+    const opCode = components[length - 1];
+    if (opCode !== OPS.OP_CHECKSAFEMULTISIG) {
       throw new Error('Expected OP_CHECKSAFEMULTISIG');
     }
-    const keyIDs = components.slice(2, 2+keyIDCount).map(bscript.decodeNumber);
-    const n = bscript.decodeNumber(components[len-2]);
-    if (n !== m+1) {
-      throw new Error('n must be equal to m+1');
+
+    const keyIDs = components.slice(2, 2 + keyIDCount).map(bscript.decodeNumber);
+    const keyCount = bscript.decodeNumber(components[length - 2]);
+    if (keyCount !== keyIDCount + 1) {
+      throw new Error('keyCount inconsistent with number of keys');
     }
-    if (n !== keyIDCount + 1) {
-      throw new Error('n inconsistent with number of keys');
+
+    if (signatureCount > keyCount) {
+      throw new Error('signatureCount exceeds number of keys');
     }
 
     const address = new Address(null, keyIDs, network);
     address.setPublicKeyHash(keyHash);
+    address.signatureCount = signatureCount;
     return address;
   }
 
@@ -129,7 +136,7 @@ class Address {
     const keyHash = buffer.slice(0, KEYHASH_SIZE);
     let pos = KEYHASH_SIZE;
     const keyIDs = [];
-    for (let i=0; i < keyIDCount; i++) {
+    for (let i = 0; i < keyIDCount; i++) {
       keyIDs.push(buffer.readUInt32LE(pos));
       pos += KEYID_SIZE;
     }
@@ -139,22 +146,22 @@ class Address {
     return address;
   }
 
-  totalKeys() {
+  getKeyCount() {
     return 1 + this.keyIDs.length;
   }
 
-  signaturesNeeded() {
-    return this.totalKeys() - 1;
+  getNeededSignatureCount() {
+    return this.signatureCount;
   }
 
   toScript() {
     const components = [
-      bscript.encodeNumber(this.signaturesNeeded()),
+      bscript.encodeNumber(this.signatureCount),
       this.publicKeyHash
     ]
     .concat(this.keyIDs.map(bscript.encodeNumber))
     .concat([
-      bscript.encodeNumber(this.totalKeys()),
+      bscript.encodeNumber(this.getKeyCount()),
       OPS.OP_CHECKSAFEMULTISIG
     ]);
     return bscript.compile(components);
@@ -183,6 +190,10 @@ class Address {
   }
 
   toBuffer() {
+    if (this.signatureCount !== this.getKeyCount() - 1) {
+      throw new Error('only (n-1)/n addresses supported');
+    }
+
     const inputBuffer = new Buffer(KEYHASH_SIZE + this.keyIDs.length * KEYID_SIZE);
     inputBuffer.fill(0); // initialize it with all zeroes
     this.publicKeyHash.copy(inputBuffer, 0);
