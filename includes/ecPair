@@ -1,0 +1,73 @@
+<h1 id="ecpair">ECPair</h1>
+
+<h2 id="create-ecpair">Create ECPair</h2>
+
+<p>Construct an ECPair object from a Buffer.</p>
+
+<h3 id="from-public-key">From Public Key</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">publicKey</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'02192d74d0…5dca52c6b4'</span><span class="p">,</span> <span class="s1">'hex'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">ecPair</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">ECPair</span><span class="p">.</span><span class="nx">fromPublicKeyBuffer</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">);</span>
+</code></pre>
+<p>Create an ECPair object based on a public key Buffer object.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">ECPair.fromPublicKeyBuffer()</code></p>
+
+<h4 id="arguments">Arguments</h4>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>buffer</td>
+<td>Buffer</td>
+<td>Yes</td>
+<td>33-byte-Buffer instance representing a public key</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<h3 id="from-private-key">From Private Key</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">privateKey</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'eaf02ca348…ffdca22694'</span><span class="p">,</span> <span class="s1">'hex'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">ecPair</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">ECPair</span><span class="p">.</span><span class="nx">fromPrivateKeyBuffer</span><span class="p">(</span><span class="nx">privateKey</span><span class="p">);</span>
+</code></pre>
+<p>Create an ECPair object based on a private key Buffer object.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">ECPair.fromPrivateKeyBuffer()</code></p>
+
+<h4 id="arguments">Arguments</h4>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>buffer</td>
+<td>Buffer</td>
+<td>Yes</td>
+<td>32-byte-Buffer instance representing a private key</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>

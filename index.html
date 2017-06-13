@@ -131,7 +131,7 @@ secured assets.</p>
 <span class="kd">let</span> <span class="nx">keyID1</span> <span class="o">=</span> <span class="mi">33554432</span><span class="p">;</span>
 <span class="kd">let</span> <span class="nx">keyID2</span> <span class="o">=</span> <span class="mi">16777216</span><span class="p">;</span>
 
-<span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">,</span> <span class="nx">keyID1</span><span class="p">,</span> <span class="nx">keyID2</span><span class="p">,</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmg</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">,</span> <span class="p">[</span><span class="nx">keyID1</span><span class="p">,</span> <span class="nx">keyID2</span><span class="p">],</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmg</span><span class="p">);</span>
 </code></pre>
 <p>Instantiate an Address object.</p>
 
@@ -164,16 +164,10 @@ secured assets.</p>
 <td>Base58-HDNode representation starting with &ldquo;xpub&rdquo; or &ldquo;xprv&rdquo;</td>
 </tr>
 <tr>
-<td>keyID1</td>
-<td>Integer</td>
+<td>keyIDs</td>
+<td>[Integer]</td>
 <td>Yes</td>
-<td>First ASP key ID</td>
-</tr>
-<tr>
-<td>keyID2</td>
-<td>Integer</td>
-<td>Yes</td>
-<td>Second ASP key ID</td>
+<td>An array of ASP key IDs</td>
 </tr>
 <tr>
 <td>network</td>

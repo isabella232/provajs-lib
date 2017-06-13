@@ -1,0 +1,47 @@
+<h1 id="transaction">Transaction</h1>
+
+<h2 id="obtain-transaction">Obtain Transaction</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">transactionHex</span> <span class="o">=</span> <span class="s1">'0100000001…ba00000000'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">.</span><span class="nx">fromHex</span><span class="p">(</span><span class="nx">transactionHex</span><span class="p">);</span>
+</code></pre>
+<p>Obtain an HDNode instance based on an xpub or xprv string.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">Transaction.fromHex()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>hex</td>
+<td>String</td>
+<td>Yes</td>
+<td>Hexadecimal transaction string</td>
+</tr>
+</tbody></table>
+
+<h2 id="get-id">Get ID</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">txID</span> <span class="o">=</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">getId</span><span class="p">();</span>
+</code></pre>
+<p>Calculate transaction ID. Returns a 64-character hexadecimal string.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transaction.getId()</code></p>
+
+<h2 id="get-hex">Get Hex</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">txHex</span> <span class="o">=</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">toHex</span><span class="p">();</span>
+</code></pre>
+<p>Converts transaction to a hexadecimal string.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transaction.toHex()</code></p>

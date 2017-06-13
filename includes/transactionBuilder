@@ -1,0 +1,354 @@
+<h1 id="transaction-builder">Transaction Builder</h1>
+
+<h2 id="create-transaction-builder">Create Transaction Builder</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">txBuilder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">TransactionBuilder</span><span class="p">(</span><span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmg</span><span class="p">);</span>
+</code></pre>
+<p>Create a transaction builder object from scratch.</p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>Yes</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<h2 id="obtain-transaction-builder">Obtain Transaction Builder</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">txHex</span> <span class="o">=</span> <span class="s1">'0100000001…ba00000000'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">.</span><span class="nx">fromHex</span><span class="p">(</span><span class="nx">txHex</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">txBuilder</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">TransactionBuilder</span><span class="p">.</span><span class="nx">fromTransaction</span><span class="p">(</span><span class="nx">transaction</span><span class="p">);</span>
+</code></pre>
+<p>Obtain a transaction builder instance based on a transaction instance.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">TransactionBuilder.fromTransaction()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>transaction</td>
+<td>Transaction</td>
+<td>Yes</td>
+<td>Instance of a transaction object</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<h2 id="get-transaction">Get Transaction</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">txBuilder</span><span class="p">.</span><span class="nx">build</span><span class="p">();</span>
+</code></pre>
+<p>Obtain a transaction instance.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.build()</code></p>
+
+<h2 id="add-output">Add Output</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">destination</span> <span class="o">=</span> <span class="s1">'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">3850000</span><span class="p">;</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">addOutput</span><span class="p">(</span><span class="nx">destination</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+</code></pre>
+<p>Add an output to the transaction builder.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.addOutput()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>destinationAddress</td>
+<td>Address</td>
+<td>Yes</td>
+<td>Address instance of the destination</td>
+</tr>
+<tr>
+<td></td>
+<td>String</td>
+<td></td>
+<td>Base58-string representation of the destination address</td>
+</tr>
+<tr>
+<td>value</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Amount in atoms of the value to send</td>
+</tr>
+</tbody></table>
+
+<h2 id="add-admin-thread-output">Add Admin Thread Output</h2>
+<pre class="highlight javascript"><code><span class="nx">txBuilder</span><span class="p">.</span><span class="nx">addAdminThreadOutput</span><span class="p">(</span><span class="nx">prova</span><span class="p">.</span><span class="nx">ADMIN</span><span class="p">.</span><span class="nx">THREADS</span><span class="p">.</span><span class="nx">PROVISIONING</span><span class="p">);</span>
+</code></pre>
+<p>Add an output to the transaction builder marking it as an admin transaction by specifying the admin thread.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.addAdminThreadOutput(threadID)</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>threadID</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Thread ID of the admin transaction. One of <code class="prettyprint">prova.ADMIN.THREADS</code></td>
+</tr>
+</tbody></table>
+
+<h2 id="add-admin-key-update-output">Add Admin Key Update Output</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">operation</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">ADMIN</span><span class="p">.</span><span class="nx">OPERATIONS</span><span class="p">.</span><span class="nx">REVOKE_KEY</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">keyType</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">ADMIN</span><span class="p">.</span><span class="nx">KEY_TYPES</span><span class="p">.</span><span class="nx">ROOT</span><span class="p">.</span><span class="nx">PROVISIONING_KEY</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">publicKey</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">ECPair</span><span class="p">.</span><span class="nx">fromPublicKeyBuffer</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'025ceeba2a…57d233edf1'</span><span class="p">,</span> <span class="s1">'hex'</span><span class="p">));</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">addKeyUpdateOutput</span><span class="p">(</span><span class="nx">operation</span><span class="p">,</span> <span class="nx">keyType</span><span class="p">,</span> <span class="nx">publicKey</span><span class="p">);</span>
+</code></pre>
+<p>Add admin output to provision or revoke a signing key.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.addKeyUpdateOutput(operation, keyType, publicKey)</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>operation</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Key operation enum. One of <code class="prettyprint">prova.ADMIN.OPERATIONS</code></td>
+</tr>
+<tr>
+<td>keyType</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Key type enum. One of <code class="prettyprint">prova.ADMIN.KEY_TYPES</code>. Nested</td>
+</tr>
+<tr>
+<td>publicKey</td>
+<td>Buffer</td>
+<td>No</td>
+<td>ECPair public or private key material as a Buffer instance</td>
+</tr>
+<tr>
+<td></td>
+<td>HDNode</td>
+<td></td>
+<td>HDNode instance</td>
+</tr>
+<tr>
+<td></td>
+<td>String</td>
+<td></td>
+<td>Base58-HDNode representation starting with &ldquo;xpub&rdquo; or &ldquo;xprv&rdquo;</td>
+</tr>
+</tbody></table>
+
+<h2 id="add-fund-destruction-output">Add Fund Destruction Output</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">amount</span> <span class="o">=</span> <span class="mi">2400000</span><span class="p">;</span> <span class="c1">// 2.4 grams</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">addFundDestructionOutput</span><span class="p">(</span><span class="nx">amount</span><span class="p">);</span>
+</code></pre>
+<p>Add admin output destroying a specified amount of funds.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.addFundDestructionOutput(amount)</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>amount</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Amount in atoms of the value to send</td>
+</tr>
+</tbody></table>
+
+<h2 id="add-input">Add Input</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">inputTransaction</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">.</span><span class="nx">fromHex</span><span class="p">(</span><span class="s1">'…'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">outputIndex</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">addInput</span><span class="p">(</span><span class="nx">inputTransaction</span><span class="p">.</span><span class="nx">getId</span><span class="p">(),</span> <span class="nx">outputIndex</span><span class="p">,</span> <span class="mh">0xffffffff</span><span class="p">);</span>
+</code></pre>
+<p>Add an input to the transaction builder.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.addInput(inputTransactionID, outputIndex, sequence)</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>inputTransactionID</td>
+<td>String</td>
+<td>Yes</td>
+<td>ID of the input&rsquo;s previous output transaction</td>
+</tr>
+<tr>
+<td>outputIndex</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Output index of the input transaction</td>
+</tr>
+<tr>
+<td>sequence</td>
+<td>Integer</td>
+<td>No</td>
+<td>Typically <code class="prettyprint">0xffffffff</code></td>
+</tr>
+</tbody></table>
+
+<h2 id="sign-input">Sign Input</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">inputIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">privateKey</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">getKey</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">outputAddress</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">.</span><span class="nx">fromBase58</span><span class="p">(</span><span class="s1">'THkSaYyczf…Ta3fNxjxqH'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">4000000</span><span class="p">;</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">inputIndex</span><span class="p">,</span> <span class="nx">privateKey</span><span class="p">,</span> <span class="nx">outputAddress</span><span class="p">.</span><span class="nx">toScript</span><span class="p">(),</span> <span class="nx">value</span><span class="p">);</span>
+</code></pre>
+<p>Sign a transaction input.</p>
+
+<aside class="notice">Due to <code>SIGHASH_ALL</code>, inputs should only be signed after all outputs are set.</aside>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.sign()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>inputIndex</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Input index of the current transaction</td>
+</tr>
+<tr>
+<td>privateKey</td>
+<td>ECPair</td>
+<td>Yes</td>
+<td>ECPair private key instance used for signing</td>
+</tr>
+<tr>
+<td>outputScript</td>
+<td>Buffer</td>
+<td>Yes</td>
+<td>Script of the previous transaction&rsquo;s output</td>
+</tr>
+<tr>
+<td>value</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Amount in atoms of the spent value</td>
+</tr>
+</tbody></table>
+
+<h2 id="simple-sign-input">Simple Sign Input</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">inputIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">privateKey</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">getKey</span><span class="p">();</span>
+<span class="kd">let</span> <span class="nx">inputTransaction</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">.</span><span class="nx">fromHex</span><span class="p">(</span><span class="s1">'…'</span><span class="p">);</span>
+<span class="nx">txBuilder</span><span class="p">.</span><span class="nx">signWtihTx</span><span class="p">(</span><span class="nx">inputIndex</span><span class="p">,</span> <span class="nx">privateKey</span><span class="p">,</span> <span class="nx">inputTransaction</span><span class="p">);</span>
+</code></pre>
+<p>Sign an input if its previous transaction is available.</p>
+
+<aside class="notice">Due to <code>SIGHASH_ALL</code>, inputs should only be signed after all outputs are set.</aside>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">transactionBuilder.signWithTx()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>inputIndex</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Input index of the current transaction</td>
+</tr>
+<tr>
+<td>privateKey</td>
+<td>ECPair</td>
+<td>Yes</td>
+<td>ECPair private key instance used for signing</td>
+</tr>
+<tr>
+<td>inputTransaction</td>
+<td>Transaction</td>
+<td>Yes</td>
+<td>Transaction whose output is used for the input to be signed</td>
+</tr>
+</tbody></table>

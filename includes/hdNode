@@ -1,0 +1,102 @@
+<h1 id="hdnode">HDNode</h1>
+
+<h2 id="obtain-hdnode">Obtain HDNode</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">xprv</span> <span class="o">=</span> <span class="s1">'xprv9s21Zr…AAmLuBpULA'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">hdNode</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">HDNode</span><span class="p">.</span><span class="nx">fromBase58</span><span class="p">(</span><span class="nx">xprv</span><span class="p">);</span>
+</code></pre>
+<p>Obtain an HDNode instance based on an xpub or xprv string.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">HDNode.fromBase58()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>base58</td>
+<td>String</td>
+<td>Yes</td>
+<td>Xpub string representing an HD public key</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>Xprv string representing an HD private key</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<h2 id="convert-hdnode">Convert HDNode</h2>
+
+<p>Convert an HDNode into a non-instance representation.</p>
+
+<h3 id="to-xpub">To Xpub</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">xpub</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">neutered</span><span class="p">().</span><span class="nx">toBase58</span><span class="p">();</span>
+</code></pre>
+<p>Convert HDNode instance to an xpub public key string representation.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">hdNode.neutered().toBase58()</code></p>
+
+<h3 id="to-xprv">To Xprv</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">xprv</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">toBase58</span><span class="p">();</span>
+</code></pre>
+<p>Convert HDNode instance to an xprv private key string representation.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">hdNode.toBase58()</code></p>
+
+<aside class="warning">If <code>hdNode</code> was constructed without a private key, this method will only return an xpub string.</aside>
+
+<h3 id="to-ecpair">To ECPair</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">ecPair</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">getKey</span><span class="p">();</span>
+</code></pre>
+<p>Get an ECPair instance representing the current node&rsquo;s public key or key pair.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">hdNode.getKey()</code></p>
+
+<h2 id="derive-hd-node">Derive HD Node</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">path</span> <span class="o">=</span> <span class="s1">'/255/1230141/255'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">derivedNode</span> <span class="o">=</span> <span class="nx">hdNode</span><span class="p">.</span><span class="nx">hdPath</span><span class="p">().</span><span class="nx">derive</span><span class="p">(</span><span class="nx">path</span><span class="p">);</span>
+</code></pre>
+<p>Derive a new HDNode instance based on an HDNode object and a derivation path.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">hdNode.hdPath().derive()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>path</td>
+<td>String</td>
+<td>Yes</td>
+<td>Derivation path</td>
+</tr>
+</tbody></table>

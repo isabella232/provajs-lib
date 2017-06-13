@@ -1,0 +1,200 @@
+<h1 id="address">Address</h1>
+
+<h2 id="create-address">Create Address</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">publicKey</span> <span class="o">=</span> <span class="s1">'xpub661MyM…RxNMpPfTSY'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">keyID1</span> <span class="o">=</span> <span class="mi">33554432</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">keyID2</span> <span class="o">=</span> <span class="mi">16777216</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">,</span> <span class="p">[</span><span class="nx">keyID1</span><span class="p">,</span> <span class="nx">keyID2</span><span class="p">],</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmg</span><span class="p">);</span>
+</code></pre>
+<p>Instantiate an Address object.</p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>publicKey</td>
+<td>Buffer</td>
+<td>No</td>
+<td>ECPair public or private key material as a Buffer instance</td>
+</tr>
+<tr>
+<td></td>
+<td>HDNode</td>
+<td></td>
+<td>HDNode instance</td>
+</tr>
+<tr>
+<td></td>
+<td>String</td>
+<td></td>
+<td>Base58-HDNode representation starting with &ldquo;xpub&rdquo; or &ldquo;xprv&rdquo;</td>
+</tr>
+<tr>
+<td>keyIDs</td>
+<td>[Integer]</td>
+<td>Yes</td>
+<td>An array of ASP key IDs</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<aside class="notice">If <code>publicKey</code> is not specified, <code>address.setPublicKeyHash()</code> needs to be called to make the instance
+usable.</aside>
+
+<h2 id="obtain-address">Obtain Address</h2>
+
+<p>Obtain an address object from a non-instance representation.</p>
+
+<h3 id="from-base58">From Base58</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">base58Address</span> <span class="o">=</span> <span class="s1">'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">.</span><span class="nx">fromBase58</span><span class="p">(</span><span class="nx">base58Address</span><span class="p">);</span>
+</code></pre>
+<p>Obtain address object from a base58-string.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">Address.fromBase58()</code></p>
+
+<h4 id="arguments">Arguments</h4>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>base58</td>
+<td>String</td>
+<td>Yes</td>
+<td>Base58-string address representation</td>
+</tr>
+</tbody></table>
+
+<h3 id="from-script">From Script</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">script</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'52147ef3c5…00000253ba'</span><span class="p">,</span> <span class="s1">'hex'</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">.</span><span class="nx">fromScript</span><span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmgTest</span><span class="p">);</span>
+</code></pre>
+<p>Obtain address object from a base58-string.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">Address.fromScript()</code></p>
+
+<h4 id="arguments">Arguments</h4>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>script</td>
+<td>Buffer</td>
+<td>Yes</td>
+<td>Output script buffer</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network</td>
+</tr>
+</tbody></table>
+
+<h2 id="verify-address">Verify Address</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">base58Address</span> <span class="o">=</span> <span class="s1">'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">isValid</span> <span class="o">=</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">.</span><span class="nx">validateBase58</span><span class="p">(</span><span class="nx">base58Address</span><span class="p">,</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmg</span><span class="p">);</span>
+</code></pre>
+<p>Check whether an address string is valid. Returns <code class="prettyprint">true</code> if valid, <code class="prettyprint">false</code> otherwise.</p>
+
+<h3 id="method">Method</h3>
+
+<p><code class="prettyprint">Address.validateBase58()</code></p>
+
+<h3 id="arguments">Arguments</h3>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>base58</td>
+<td>String</td>
+<td>Yes</td>
+<td>Base58-string address representation</td>
+</tr>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network. If set, ensures the address is on the given network.</td>
+</tr>
+</tbody></table>
+
+<h2 id="convert-address">Convert Address</h2>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">address</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">prova</span><span class="p">.</span><span class="nx">Address</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">,</span> <span class="nx">keyID1</span><span class="p">,</span> <span class="nx">keyID2</span><span class="p">);</span>
+</code></pre>
+<p>Convert an address instance to a non-instance representation.</p>
+
+<h3 id="to-base58">To Base58</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">base58Address</span> <span class="o">=</span> <span class="nx">address</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="nx">prova</span><span class="p">.</span><span class="nx">networks</span><span class="p">.</span><span class="nx">rmgTest</span><span class="p">);</span>
+</code></pre>
+<p>Convert an address object to a base58-string.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">address.toString()</code></p>
+
+<h4 id="arguments">Arguments</h4>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>network</td>
+<td>prova.networks Object</td>
+<td>No</td>
+<td>The chain network. If set, overrides the network.</td>
+</tr>
+</tbody></table>
+
+<h3 id="to-script">To Script</h3>
+<pre class="highlight javascript"><code><span class="kd">let</span> <span class="nx">script</span> <span class="o">=</span> <span class="nx">address</span><span class="p">.</span><span class="nx">toScript</span><span class="p">();</span>
+</code></pre>
+<p>Convert an address to an output script. Returns a <code class="prettyprint">Buffer</code> instance.</p>
+
+<h4 id="method">Method</h4>
+
+<p><code class="prettyprint">address.toScript()</code></p>
+
+<h2 id="set-public-key">Set Public Key</h2>
+
+<h2 id="set-public-key-hash">Set Public Key Hash</h2>
