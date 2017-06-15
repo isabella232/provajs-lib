@@ -173,14 +173,14 @@ class Address {
     } else if (Buffer.isBuffer(publicKey)) {
       this.publicKey = ECPair.fromPublicKeyBuffer(publicKey);
     } else if (publicKey instanceof HDNode) {
-      return this.setPublicKey(publicKey.getPublicKeyBuffer());
+      this.publicKey = publicKey.getKey();
     } else if (publicKey.startsWith('xpub') || publicKey.startsWith('xprv')) {
       const hdNode = HDNode.fromBase58(publicKey, this.network);
-      return this.setPublicKey(hdNode.getPublicKeyBuffer());
+      this.publicKey = hdNode.getKey();
     }
 
     // calculate the public key hash
-    const encodedPublicKey = this.publicKey.__Q.getEncoded(true);
+    const encodedPublicKey = this.publicKey.getPublicKeyBuffer();
     this.publicKeyHash = bitcoin.crypto.hash160(encodedPublicKey);
   }
 

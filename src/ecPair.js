@@ -1,11 +1,18 @@
 const bitcoin = require('bitcoinjs-lib');
 const crypto = require('crypto');
 const ecurve = require('ecurve');
+const curve = ecurve.getCurveByName('secp256k1');
 const BigInteger = require('bigi');
 const NETWORKS = require('./networks');
-const secp256k1 = ecurve.getCurveByName('secp256k1');
 const typeforce = require('typeforce');
 const types = require('./types');
+
+let secp256k1;
+try {
+  secp256k1 = require('secp256k1');
+} catch (err) {
+  console.log('running without secp256k1 acceleration');
+}
 
 const ECPair = function ECPair(d, Q, options = {}) {
   try {
@@ -21,7 +28,7 @@ const ECPair = function ECPair(d, Q, options = {}) {
     if (d.signum() <= 0) {
       throw new Error('Private key must be greater than 0');
     }
-    if (d.compareTo(secp256k1.n) >= 0) {
+    if (d.compareTo(curve.n) >= 0) {
       throw new Error('Private key must be less than the curve order');
     }
     if (Q) {
@@ -46,7 +53,7 @@ const ECPair = function ECPair(d, Q, options = {}) {
 ECPair.prototype = bitcoin.ECPair.prototype;
 
 ECPair.fromPublicKeyBuffer = function(buffer, network) {
-  const Q = ecurve.Point.decodeFrom(secp256k1, buffer);
+  const Q = ecurve.Point.decodeFrom(curve, buffer);
 
   return new ECPair(null, Q, {
     compressed: Q.compressed,
@@ -62,11 +69,16 @@ ECPair.fromPrivateKeyBuffer = function(buffer, network) {
   }
   const d = BigInteger.fromBuffer(buffer);
 
-  if (d.signum() <= 0 || d.compareTo(secp256k1.n) >= 0) {
+  if (d.signum() <= 0 || d.compareTo(curve.n) >= 0) {
     throw new Error('bad private key buffer');
   }
 
-  return new ECPair(d, null, { network: network });
+  const ecPair = new ECPair(d, null, { network: network });
+  if (!ecPair.__Q && curve) {
+    ecPair.__Q = ecurve.Point.decodeFrom(curve, secp256k1.publicKeyCreate(d.toBuffer(32), false));
+  }
+
+  return ecPair;
 };
 
 ECPair.makeRandom = function(network) {

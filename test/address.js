@@ -233,6 +233,21 @@ describe('Address', function() {
     assert.strictEqual(addressString, aztecAddress1.toString());
   });
 
+  it('assembles Prova address with ECPair from private and public keys', function() {
+    const xprv = 'xprv9s21ZrQH143K3YbWtKTYyi6qx9FT14u5wowHU13pxS12jT84hhA8gNdZHL28iyfSAkd4sAiRanRwzJ3bRykUvmwDMAKp9gFwRAAmLuBpULA';
+    const xpub = 'xpub661MyMwAqRbcG2fyzLzZLr3aWB5wQXcwK2rtGPTSWmY1cFTDFEUPEAx38dBg9TxiKxEQQTAr3Nfyy25VqYFzg5d2E5J95D9XxVbVq5BsF3Z';
+    const ecPairPrivate = prova.HDNode.fromBase58(xprv).getKey();
+    const rebuiltEcPairPrivate = prova.ECPair.fromPrivateKeyBuffer(Buffer.from('e274570fe47739cf9d72f4753926c2aecc7208cd5e418e14876a292b789e2362', 'hex'));
+    const ecPairPublic = prova.HDNode.fromBase58(xpub).getKey();
+    const aztecAddress1 = new prova.Address(ecPairPrivate, keyIDs, prova.networks.rmg);
+    const aztecAddress2 = new prova.Address(rebuiltEcPairPrivate, keyIDs, prova.networks.rmg);
+    const aztecAddress3 = new prova.Address(ecPairPublic, keyIDs, prova.networks.rmg);
+    const addressString = 'GHhkNgqmMjwUjVYmsRjW281HhFRXuSX5cuFQc4C88Esyi';
+    assert.strictEqual(addressString, aztecAddress1.toString());
+    assert.strictEqual(aztecAddress1.toString(), aztecAddress2.toString());
+    assert.strictEqual(aztecAddress2.toString(), aztecAddress3.toString());
+  });
+
   it('reassembles Prova address from string', function() {
     const addressString = 'THkSaYyczf2X3EgGcoxnyNHYsYQpaBNncBRTa3fNxjxqH';
     const aztecAddress = prova.Address.fromBase58(addressString);
