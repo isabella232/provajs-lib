@@ -8,7 +8,18 @@ const script = require('./script');
 const networks = require('./networks');
 const Transaction = require('./transaction');
 
-const TransactionBuilder = bitcoin.TransactionBuilder;
+const TransactionBuilder = function(network = networks.rmg, maximumFeeRate) {
+  this.prevTxMap = {};
+  this.network = network;
+
+  // WARNING: This is __NOT__ to be relied on, its just another potential safety mechanism (safety in-depth)
+  this.maximumFeeRate = maximumFeeRate || 1000;
+
+  this.inputs = [];
+  this.tx = new Transaction()
+};
+Object.assign(TransactionBuilder, bitcoin.TransactionBuilder);
+TransactionBuilder.prototype.__proto__ = bitcoin.TransactionBuilder.prototype;
 
 TransactionBuilder.ADMIN = ADMIN;
 
@@ -45,30 +56,30 @@ const determineKeyUpdateOpCode = (operation, keyType) => {
   const keyTypes = ADMIN.KEY_TYPES;
   switch (keyType) {
     case keyTypes.ROOT.ISSUANCE_KEY:
-      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation === ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_ISSUEKEYADD;
-      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation === ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_ISSUEKEYREVOKE;
       }
       break;
     case keyTypes.ROOT.PROVISIONING_KEY:
-      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation === ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_PROVISIONKEYADD;
-      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation === ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_PROVISIONKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.VALIDATOR_KEY:
-      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation === ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_VALIDATEKEYADD;
-      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation === ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_VALIDATEKEYREVOKE;
       }
       break;
     case keyTypes.PROVISIONING.ACCOUNT_SERVICE_PROVIDER_KEY:
-      if (operation == ADMIN.OPERATIONS.ADD_KEY) {
+      if (operation === ADMIN.OPERATIONS.ADD_KEY) {
         return OPS.ADMIN_OP_ASPKEYADD;
-      } else if (operation == ADMIN.OPERATIONS.REVOKE_KEY) {
+      } else if (operation === ADMIN.OPERATIONS.REVOKE_KEY) {
         return OPS.ADMIN_OP_ASPKEYREVOKE;
       }
       break;
@@ -76,9 +87,28 @@ const determineKeyUpdateOpCode = (operation, keyType) => {
   throw new Error('invalid admin key type and operation combination');
 };
 
-const oldFromTransaction = TransactionBuilder.fromTransaction;
 TransactionBuilder.fromTransaction = function(transaction, network = networks.rmg) {
-  return oldFromTransaction(transaction, network);
+  const txb = new TransactionBuilder(network);
+
+  // Copy transaction fields
+  txb.setVersion(transaction.version);
+  txb.setLockTime(transaction.locktime);
+
+  // Copy outputs (done first to avoid signature invalidation)
+  transaction.outs.forEach(function (txOut) {
+    txb.addOutput(txOut.script, txOut.value);
+  });
+
+  // Copy inputs
+  transaction.ins.forEach(function (txIn) {
+    txb.__addInputUnsafe(txIn.hash, txIn.index, {
+      sequence: txIn.sequence,
+      script: txIn.script,
+      witness: txIn.witness
+    });
+  });
+
+  return txb;
 };
 
 /**

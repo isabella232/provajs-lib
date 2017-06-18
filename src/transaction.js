@@ -8,7 +8,14 @@ const varuint = require('varuint-bitcoin');
 
 const ZERO = new Buffer('0000000000000000000000000000000000000000000000000000000000000000', 'hex');
 
-const Transaction = bitcoin.Transaction;
+const Transaction = function() {
+  this.version = 1;
+  this.locktime = 0;
+  this.ins = [];
+  this.outs = [];
+};
+Object.assign(Transaction, bitcoin.Transaction);
+Transaction.prototype.__proto__ = bitcoin.Transaction.prototype;
 
 const varSliceSize = (someScript, __isStripped) => {
   let length = someScript.length;
@@ -44,6 +51,17 @@ const bufferWriteUInt64LE = (buffer, value, offset) => {
 const bufferWriteVarInt = (buffer, number, offset) => {
   varuint.encode(number, buffer, offset);
   return varuint.encode.bytes;
+};
+
+Transaction.fromBuffer = function(buffer, __noStrict) {
+  const rootTransaction = bitcoin.Transaction.fromBuffer(buffer, __noStrict);
+  const provaTransaction = new Transaction();
+  Object.assign(provaTransaction, rootTransaction);
+  return provaTransaction;
+};
+
+Transaction.fromHex = function(hex) {
+  return this.fromBuffer(Buffer.from(hex, 'hex'));
 };
 
 Transaction.prototype.getHash = function() {

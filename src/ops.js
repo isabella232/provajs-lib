@@ -1,4 +1,4 @@
-const OPS = require('bitcoin-ops');
+const OPS = Object.assign({}, require('bitcoin-ops'));
 
 OPS.OP_CHECKSAFEMULTISIG = 186;
 OPS.OP_CHECKTHREAD = 187;

@@ -16,7 +16,23 @@ try {
   console.log('running without secp256k1 acceleration');
 }
 
-const HDNode = bitcoin.HDNode;
+const HDNode = function HDNode(keyPair, chainCode) {
+  try {
+    typeforce(types.tuple('ECPair', types.BufferN(32)), arguments);
+  } catch (e) {
+    throw new Error(e.message);
+  }
+
+  if (!keyPair.compressed) throw new TypeError('BIP32 only allows compressed keyPairs');
+
+  this.keyPair = keyPair;
+  this.chainCode = chainCode;
+  this.depth = 0;
+  this.index = 0;
+  this.parentFingerprint = 0x00000000;
+};
+Object.assign(HDNode, bitcoin.HDNode);
+HDNode.prototype.__proto__ = bitcoin.HDNode.prototype;
 
 const inferredNetworks = [
   NETWORKS.rmg,

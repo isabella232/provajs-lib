@@ -50,7 +50,7 @@ const ECPair = function ECPair(d, Q, options = {}) {
   this.network = options.network || NETWORKS.bitcoin;
 };
 
-ECPair.prototype = bitcoin.ECPair.prototype;
+ECPair.prototype.__proto__ = bitcoin.ECPair.prototype;
 
 ECPair.fromPublicKeyBuffer = function(buffer, network) {
   const Q = ecurve.Point.decodeFrom(curve, buffer);

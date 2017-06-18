@@ -265,6 +265,15 @@ describe('HDNode', function() {
     });
   });
 
+  describe('Compatibility', function(){
+    it('should not overwrite bitcoinjs-lib methods', function(){
+      const hdNode = bitcoin.HDNode.fromBase58('xpub661MyMwAqRbcFfMYQX9xJftaf9oLChq7unXqHAN2CKYs7CTJo4XUohysxtFJEtcQkbmNSJHpEEJakPSQyYAC6YU6J1ReQTQDKtBoDX3uWvV');
+      const provaNode = prova.HDNode.fromBase58('xpub661MyMwAqRbcFfMYQX9xJftaf9oLChq7unXqHAN2CKYs7CTJo4XUohysxtFJEtcQkbmNSJHpEEJakPSQyYAC6YU6J1ReQTQDKtBoDX3uWvV');
+      hdNode.keyPair.network.should.equal(bitcoin.networks.bitcoin);
+      provaNode.keyPair.network.should.not.equal(bitcoin.networks.bitcoin);
+    });
+  });
+
   describe('Network Consistency', function() {
     it('should preserve network through derivations', function() {
       const prv = 'xprv9s21ZrQH143K2KNCT5MHvotjrf4gSjv7zL5KXPvxaZwshFZn3cptpyWJGmajrY9pH9Rix41msRQCUzUeBATAg1u4LscmXi8gg7KNRDCAnFz';

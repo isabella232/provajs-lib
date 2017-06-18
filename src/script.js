@@ -2,7 +2,7 @@ const bitcoin = require('bitcoinjs-lib');
 const OPS = require('bitcoin-ops');
 const OP_INT_BASE = OPS.OP_RESERVED; // OP_1 - 1
 
-const script = bitcoin.script;
+const script = Object.assign({}, bitcoin.script);
 
 script.encodeNumber = function(number) {
   if (Buffer.isBuffer(number)) return number;
