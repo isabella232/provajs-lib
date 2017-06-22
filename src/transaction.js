@@ -256,6 +256,13 @@ Transaction.prototype.hashForWitnessV0 = function(inIndex, prevOutScript, value,
   return bitcoin.crypto.hash256(tbuffer);
 };
 
+Transaction.prototype.clone = function() {
+  const bitcoinClone = bitcoin.Transaction.prototype.clone.apply(this);
+  const provaClone = new Transaction();
+  Object.assign(provaClone, bitcoinClone);
+  return provaClone;
+};
+
 const determineOpCodeOperation = (opCode) => {
   const keyTypes = ADMIN.KEY_TYPES;
   const operations = ADMIN.OPERATIONS;
