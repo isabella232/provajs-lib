@@ -7,6 +7,7 @@ const OPS = require('./ops');
 const script = require('./script');
 const networks = require('./networks');
 const Transaction = require('./transaction');
+const _ = require('lodash');
 
 const TransactionBuilder = function(network = networks.rmg, maximumFeeRate) {
   this.prevTxMap = {};
@@ -318,8 +319,7 @@ TransactionBuilder.prototype.sign = function(vin, keyPair, redeemScript, redeemV
   if (!(keyPair instanceof ECPair)) {
     throw new Error('keyPair needs to be instance of ECPair');
   }
-
-  if (keyPair.network !== this.network) {
+  if (!_.isEqual(keyPair.network, this.network)) {
     throw new Error('Inconsistent network');
   }
   if (!this.inputs[vin]) {
