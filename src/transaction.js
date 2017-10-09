@@ -165,7 +165,7 @@ Transaction.prototype.__toBuffer = function(buffer, initialOffset = 0, __allowWi
 
 Transaction.prototype.hashForWitnessV0 = function(inIndex, prevOutScript, value, hashType) {
   try {
-    typeforce(types.tuple(types.UInt32, types.Buffer, types.Satoshi, types.UInt32), arguments);
+    typeforce(types.tuple(types.UInt32, typeforce.maybe(types.Buffer), types.Satoshi, types.UInt32), arguments);
   } catch (e) {
     throw new Error(e.message);
   }

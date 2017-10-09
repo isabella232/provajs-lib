@@ -309,10 +309,9 @@ TransactionBuilder.prototype.signWithTx = function(vin, keyPair, prevOutTx) {
   }
   const previousOutputIndex = currentIn.index;
   const prevOut = prevOutTx.outs[previousOutputIndex];
-  const hashScript = prevOut.script;
   const witnessValue = prevOut.value;
 
-  return this.sign(vin, keyPair, hashScript, witnessValue);
+  return this.sign(vin, keyPair, null, witnessValue);
 };
 
 TransactionBuilder.prototype.sign = function(vin, keyPair, redeemScript, redeemValue) {

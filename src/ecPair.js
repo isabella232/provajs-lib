@@ -102,4 +102,9 @@ ECPair.prototype.getPrivateKeyBuffer = function() {
   return buffer;
 };
 
+ECPair.prototype.verify = function(hash, signature) {
+  const ecSignature = bitcoin.ECSignature.parseScriptSignature(signature);
+  return bitcoin.ECPair.prototype.verify.apply(this, [hash, ecSignature.signature]);
+};
+
 module.exports = ECPair;

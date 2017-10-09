@@ -27,6 +27,15 @@ describe('Transaction Builder', function() {
     const incompleteTx = builder.buildIncomplete();
     assert.strictEqual(incompleteTx.getId(), txid);
     assert.strictEqual(incompleteTx.toHex(), halfSignedHex);
+
+    // should verify first signature
+    const sigScript = incompleteTx.ins[0].script;
+    const scriptComponents = prova.script.decompile(sigScript);
+    const signature = scriptComponents[1];
+    const signatureHash = transaction.hashForWitnessV0(0, null, coinbase.outs[0].value, prova.Transaction.SIGHASH_ALL);
+    const isValidSignature = keyPair1.verify(signatureHash, signature);
+    assert.strictEqual(isValidSignature, true);
+
     // add second signature
     const keyPair2 = prova.ECPair.fromPrivateKeyBuffer(new Buffer('2b8c52b77b327c755b9b375500d3f4b2da9b0a1ff65f6891d311fe94295bc26a', 'hex'), prova.networks.rmg);
     builder.signWithTx(0, keyPair2, coinbase);
