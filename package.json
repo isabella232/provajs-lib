@@ -1,6 +1,6 @@
 {
   "name": "prova-lib",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Library for interacting with Prova-blockchain-secured assets",
   "main": "index.js",
   "scripts": {
@@ -34,14 +34,14 @@
     "varuint-bitcoin": "~1.0.4"
   },
   "optionalDependencies": {
-    "secp256k1": "~3.3.0"
+    "secp256k1": "~3.5.0"
   },
   "devDependencies": {
     "assert": "~1.4.1",
     "babel-preset-es2015": "~6.22.0",
     "babelify": "~7.3.0",
     "browserify": "~14.0.0",
-    "mocha": "~3.2.0",
+    "mocha": "~5.2.0",
     "should": "~11.2.0"
   }
 }
